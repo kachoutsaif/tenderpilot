@@ -1,0 +1,35 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: tender
+      POSTGRES_PASSWORD: tender
+      POSTGRES_DB: tenderpilot
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tender -d tenderpilot"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: .
+    env_file: .env
+    environment:
+      # dans Docker, la base s'appelle "db", pas "localhost"
+      DATABASE_URL: postgresql://tender:tender@db:5432/tenderpilot
+      EMBEDDING_CACHE_DIR: /models
+    ports:
+      - "8000:8000"
+    volumes:
+      - models:/models   # le modèle d'embedding n'est téléchargé qu'une fois
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  models:

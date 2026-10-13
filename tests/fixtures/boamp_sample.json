@@ -1,0 +1,49 @@
+{
+  "_note": "Avis FICTIFS créés pour les tests. Ils imitent la forme des enregistrements BOAMP mais ne correspondent à aucun marché réel.",
+  "results": [
+    {
+      "idweb": "TEST-0001",
+      "objet": "Prestations de nettoyage des locaux administratifs de la commune de Valbrise",
+      "nomacheteur": "Commune de Valbrise (fictive)",
+      "dateparution": "2026-10-01",
+      "datelimitereponse": "2026-11-05T12:00:00+00:00",
+      "nature": "APPEL_OFFRE",
+      "nature_libelle": "Avis de marché",
+      "type_marche": ["SERVICES"],
+      "descripteur_libelle": ["Nettoyage de locaux"],
+      "url_avis": null,
+      "donnees": "{\"OBJET\": {\"DESCRIPTION\": \"Nettoyage quotidien de 3 bâtiments administratifs (4 200 m² au total), vitrerie trimestrielle.\", \"DUREE\": \"12 mois reconductible 3 fois\"}, \"CONDITIONS\": {\"CRITERES\": \"Prix 40 %, valeur technique 60 %\", \"CAPACITE\": \"Chiffre d'affaires annuel minimum de 300 000 euros\"}}"
+    },
+    {
+      "idweb": "TEST-0002",
+      "objet": "Maintenance du parc informatique et assistance aux utilisateurs",
+      "nomacheteur": "Communauté d'agglomération du Littoral Nord (fictive)",
+      "dateparution": "2026-10-03",
+      "datelimitereponse": "2026-11-20T17:00:00+00:00",
+      "nature": "APPEL_OFFRE",
+      "nature_libelle": "Avis de marché",
+      "type_marche": ["SERVICES"],
+      "descripteur_libelle": ["Informatique (prestations de services)", "Maintenance"],
+      "url_avis": null,
+      "donnees": {"OBJET": {"DESCRIPTION": "Maintenance préventive et corrective de 650 postes de travail et 40 serveurs, support niveau 1 et 2.", "LIEU": "Siège de l'agglomération"}, "CONDITIONS": {"CRITERES": "Valeur technique 50 %, prix 40 %, délais d'intervention 10 %", "CERTIFICATIONS": "ISO 27001 souhaitée"}}
+    },
+    {
+      "idweb": "TEST-0003",
+      "objet": "Fourniture de repas pour la restauration scolaire",
+      "nomacheteur": "Syndicat intercommunal scolaire des Trois Vallées (fictif)",
+      "dateparution": "2026-10-05",
+      "datelimitereponse": "2026-11-12T12:00:00+00:00",
+      "nature": "APPEL_OFFRE",
+      "nature_libelle": "Avis de marché",
+      "type_marche": ["FOURNITURES"],
+      "descripteur_libelle": ["Restauration collective"],
+      "url_avis": null,
+      "donnees": "{\"OBJET\": {\"DESCRIPTION\": \"Livraison en liaison froide d'environ 1 100 repas par jour pour 8 écoles, dont 50 % de produits durables.\"}}"
+    },
+    {
+      "idweb": "",
+      "objet": "Avis sans identifiant : doit être ignoré",
+      "donnees": null
+    }
+  ]
+}

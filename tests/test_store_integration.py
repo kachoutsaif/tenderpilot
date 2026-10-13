@@ -1,0 +1,59 @@
+"""Test d'intégration avec un vrai Postgres + pgvector.
+
+Lancé seulement si TEST_DATABASE_URL est défini (dans la CI, ou en local).
+ATTENTION : ce test supprime les tables. Utilisez une base dédiée aux tests,
+jamais votre base de développement.
+"""
+
+import os
+
+import pytest
+
+pytestmark = pytest.mark.integration
+
+DATABASE_URL = os.environ.get("TEST_DATABASE_URL")
+if not DATABASE_URL:
+    pytest.skip("TEST_DATABASE_URL non défini : test d'intégration ignoré", allow_module_level=True)
+pytest.importorskip("psycopg")
+pytest.importorskip("pgvector")
+
+from tenderpilot.ingestion.boamp import record_to_notice  # noqa: E402
+from tenderpilot.rag.pipeline import ingest_notice  # noqa: E402
+from tenderpilot.store import PgVectorStore  # noqa: E402
+
+from .conftest import FakeEmbedder  # noqa: E402
+
+
+@pytest.fixture
+def pg_store():
+    embedder = FakeEmbedder()
+    store = PgVectorStore(DATABASE_URL, dim=embedder.dim)
+    store.conn.execute("DROP TABLE IF EXISTS chunks, notices")
+    store.init_schema()
+    yield store, embedder
+    store.conn.execute("DROP TABLE IF EXISTS chunks, notices")
+    store.close()
+
+
+def test_ingest_and_search_in_postgres(pg_store, sample_records):
+    store, embedder = pg_store
+    for record in sample_records:
+        notice = record_to_notice(record)
+        if notice:
+            ingest_notice(notice, embedder, store, max_chars=400, overlap=50)
+
+    notices, chunks = store.count()
+    assert notices == 3 and chunks >= 3
+
+    results = store.search(embedder.embed(["maintenance postes informatiques serveurs"])[0], k=2)
+    assert results[0].notice_id == "TEST-0002"
+    assert results[0].title.startswith("Maintenance")
+
+
+def test_reingestion_replaces_chunks(pg_store, sample_records):
+    store, embedder = pg_store
+    notice = record_to_notice(sample_records[0])
+    ingest_notice(notice, embedder, store)
+    first = store.count()
+    ingest_notice(notice, embedder, store)
+    assert store.count() == first
