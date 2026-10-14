@@ -1,0 +1,280 @@
+{
+  "label": "naif",
+  "date": "2026-10-14T03:15:26",
+  "config": {
+    "k": 5,
+    "embedding_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    "llm_model": "openai/gpt-oss-120b",
+    "chunk_size": 1200,
+    "chunk_overlap": 200
+  },
+  "summary": {
+    "global": {
+      "questions": 8,
+      "hit@k": 1.0,
+      "recall@k": 0.857,
+      "mrr": 0.786,
+      "fidelite": null,
+      "hors_sujet_ok": null,
+      "citations_invalides": 0,
+      "erreurs": 0,
+      "latence_moy_s": null,
+      "latence_p95_s": null
+    },
+    "par_type": {
+      "filtre": {
+        "questions": 1,
+        "hit@k": 1.0,
+        "recall@k": 1.0,
+        "mrr": 0.5,
+        "fidelite": null,
+        "hors_sujet_ok": null,
+        "citations_invalides": 0,
+        "erreurs": 0,
+        "latence_moy_s": null,
+        "latence_p95_s": null
+      },
+      "hors_sujet": {
+        "questions": 1,
+        "hit@k": null,
+        "recall@k": null,
+        "mrr": null,
+        "fidelite": null,
+        "hors_sujet_ok": null,
+        "citations_invalides": 0,
+        "erreurs": 0,
+        "latence_moy_s": null,
+        "latence_p95_s": null
+      },
+      "liste": {
+        "questions": 2,
+        "hit@k": 1.0,
+        "recall@k": 0.5,
+        "mrr": 0.75,
+        "fidelite": null,
+        "hors_sujet_ok": null,
+        "citations_invalides": 0,
+        "erreurs": 0,
+        "latence_moy_s": null,
+        "latence_p95_s": null
+      },
+      "recherche": {
+        "questions": 4,
+        "hit@k": 1.0,
+        "recall@k": 1.0,
+        "mrr": 0.875,
+        "fidelite": null,
+        "hors_sujet_ok": null,
+        "citations_invalides": 0,
+        "erreurs": 0,
+        "latence_moy_s": null,
+        "latence_p95_s": null
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "q01",
+      "kind": "recherche",
+      "question": "Quels marchés de signalisation routière sont ouverts ?",
+      "expected": [
+        "26-98309"
+      ],
+      "retrieved": [
+        "26-98567",
+        "26-98309",
+        "26-98506",
+        "26-99206",
+        "26-98447"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 0.5,
+      "search_seconds": 0.06538040799932787,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q02",
+      "kind": "recherche",
+      "question": "La ville de Nevers a-t-elle publié un marché de panneaux de signalisation ?",
+      "expected": [
+        "26-98309"
+      ],
+      "retrieved": [
+        "26-98309",
+        "26-98883",
+        "26-99208",
+        "26-98641",
+        "26-99378"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.01852199300265056,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q03",
+      "kind": "recherche",
+      "question": "Y a-t-il un marché de nettoyage des locaux et de la vitrerie à Maubeuge ?",
+      "expected": [
+        "26-98519"
+      ],
+      "retrieved": [
+        "26-98519",
+        "26-99250",
+        "26-99251",
+        "26-98400"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.015566474001388997,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q04",
+      "kind": "recherche",
+      "question": "Quels marchés concernent la propreté des espaces publics ?",
+      "expected": [
+        "26-98400"
+      ],
+      "retrieved": [
+        "26-98400",
+        "26-98519"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.012902546997793252,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q05",
+      "kind": "liste",
+      "question": "Quels marchés de nettoyage sont ouverts ?",
+      "expected": [
+        "26-98519",
+        "26-98400"
+      ],
+      "retrieved": [
+        "26-98400",
+        "26-98351",
+        "26-99250"
+      ],
+      "hit": 1.0,
+      "recall": 0.5,
+      "rr": 1.0,
+      "search_seconds": 0.01210742900002515,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q06",
+      "kind": "liste",
+      "question": "Quels marchés de fourniture de matériel informatique sont ouverts ?",
+      "expected": [
+        "26-98537",
+        "26-98342"
+      ],
+      "retrieved": [
+        "26-98837",
+        "26-98342",
+        "26-99282",
+        "26-98935",
+        "26-98506"
+      ],
+      "hit": 1.0,
+      "recall": 0.5,
+      "rr": 0.5,
+      "search_seconds": 0.01607906899880618,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q07",
+      "kind": "filtre",
+      "question": "Quels marchés informatiques ont une durée de plus de 24 mois ?",
+      "expected": [
+        "26-98537",
+        "26-98342"
+      ],
+      "retrieved": [
+        "26-98422",
+        "26-98537",
+        "26-98334",
+        "26-99094",
+        "26-98342"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 0.5,
+      "search_seconds": 0.010272035000525648,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q08",
+      "kind": "hors_sujet",
+      "question": "Quel est le prix du marché de construction du stade olympique de Marseille ?",
+      "expected": [],
+      "retrieved": [
+        "26-98402",
+        "26-98538",
+        "26-99192",
+        "26-98533",
+        "26-98307"
+      ],
+      "hit": null,
+      "recall": null,
+      "rr": null,
+      "search_seconds": 0.029544465000071796,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    }
+  ]
+}
