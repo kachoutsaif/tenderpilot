@@ -57,3 +57,13 @@ def test_reingestion_replaces_chunks(pg_store, sample_records):
     first = store.count()
     ingest_notice(notice, embedder, store)
     assert store.count() == first
+
+
+def test_delete_notices(pg_store, sample_records):
+    store, embedder = pg_store
+    for record in sample_records[:2]:
+        ingest_notice(record_to_notice(record), embedder, store)
+    assert store.delete_notices(["TEST-0001", "INCONNU"]) == 1
+    notices, _ = store.count()
+    assert notices == 1
+    assert store.delete_notices([]) == 0

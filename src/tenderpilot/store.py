@@ -97,6 +97,13 @@ class PgVectorStore:
                     ],
                 )
 
+    def delete_notices(self, notice_ids: Sequence[str]) -> int:
+        """Supprime des avis (et leurs morceaux). Renvoie le nombre d'avis supprimés."""
+        if not notice_ids:
+            return 0
+        cur = self.conn.execute("DELETE FROM notices WHERE id = ANY(%s)", (list(notice_ids),))
+        return cur.rowcount
+
     def search(self, query_vector: np.ndarray, k: int = 5) -> list[RetrievedChunk]:
         """Les k morceaux les plus proches (similarité cosinus)."""
         rows = self.conn.execute(

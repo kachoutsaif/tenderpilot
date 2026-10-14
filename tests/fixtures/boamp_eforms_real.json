@@ -1,0 +1,71 @@
+{
+ "_note": "Avis BOAMP réels (26-98309, 26-98298) reconstitués à partir de l'API en octobre 2026 et allégés pour les tests ; contacts retirés.",
+ "results": [
+  {
+   "idweb": "26-98309",
+   "objet": "FOURNITURE ET LIVRAISON DE SIGNALISATION ROUTIERE VERTICALE",
+   "famille": "JOUE",
+   "code_departement": [
+    "58"
+   ],
+   "dateparution": "2026-10-13",
+   "datelimitereponse": "2026-11-09T10:00:00+00:00",
+   "nomacheteur": "Ville de Nevers",
+   "procedure_libelle": "Procédure Ouverte",
+   "nature": "APPEL_OFFRE",
+   "nature_libelle": "Avis de marché",
+   "etat": "RECTIFICATIF",
+   "descripteur_libelle": [
+    "Signalisation",
+    "Panneaux",
+    "Matériaux routiers"
+   ],
+   "type_marche": [
+    "FOURNITURES"
+   ],
+   "type_marche_facette": [
+    "Fournitures"
+   ],
+   "annonce_lie": [
+    "26-93392"
+   ],
+   "donnees": "{\"EFORMS\": {\"ContractNotice\": {\"ext:UBLExtensions\": {\"ext:UBLExtension\": {\"ext:ExtensionContent\": {\"efext:EformsExtension\": {\"efac:Changes\": {\"efbc:ChangedNoticeIdentifier\": \"670264-2026\", \"efac:Change\": {\"efbc:ChangeDescription\": {\"@languageID\": \"FRA\", \"#text\": \"Report date et heure de remise des offres\"}, \"efac:ChangedSection\": [{\"efbc:ChangedSectionIdentifier\": \"LOT-0001\"}, {\"efbc:ChangedSectionIdentifier\": \"LOT-0002\"}]}, \"efac:ChangeReason\": {\"cbc:ReasonCode\": {\"@listName\": \"change-corrig-justification\", \"#text\": \"cor-buy\"}, \"efbc:ReasonDescription\": {\"@languageID\": \"FRA\", \"#text\": \"Report date et heure de remise des offres\"}}}, \"efac:NoticeSubType\": {\"cbc:SubTypeCode\": {\"@listName\": \"notice-subtype\", \"#text\": \"16\"}}, \"efac:Organizations\": {\"efac:Organization\": [{\"efac:Company\": {\"cbc:WebsiteURI\": \"https://www.nevers.fr\", \"cac:PartyIdentification\": {\"cbc:ID\": {\"@schemeName\": \"organization\", \"#text\": \"ORG-0001\"}}, \"cac:PartyName\": {\"cbc:Name\": {\"@languageID\": \"FRA\", \"#text\": \"Ville de Nevers\"}}, \"cac:PostalAddress\": {\"cbc:CityName\": \"Nevers\", \"cbc:PostalZone\": \"58000\", \"cac:Country\": {\"cbc:IdentificationCode\": {\"@listName\": \"country\", \"#text\": \"FRA\"}}}}}, {\"efac:Company\": {\"cbc:WebsiteURI\": \"https://www.telerecours.fr\", \"cac:PartyIdentification\": {\"cbc:ID\": {\"@schemeName\": \"organization\", \"#text\": \"ORG-0002\"}}, \"cac:PartyName\": {\"cbc:Name\": {\"@languageID\": \"FRA\", \"#text\": \"Tribunal administratif de Dijon\"}}, \"cac:PostalAddress\": {\"cbc:CityName\": \"DIJON\", \"cbc:PostalZone\": \"21016\", \"cac:Country\": {\"cbc:IdentificationCode\": {\"@listName\": \"country\", \"#text\": \"FRA\"}}}}}]}}}}}, \"cbc:UBLVersionID\": \"2.3\", \"cbc:CustomizationID\": \"eforms-sdk-1.13\", \"cbc:ID\": {\"@schemeName\": \"notice-id\", \"#text\": \"e4b4b9c4-5df3-4d1f-8dc8-a39bd064d03b\"}, \"cbc:NoticeTypeCode\": {\"@listName\": \"competition\", \"#text\": \"cn-standard\"}, \"cac:ContractingParty\": {\"cac:ContractingPartyType\": {\"cbc:PartyTypeCode\": {\"@listName\": \"buyer-legal-type\", \"#text\": \"la\"}}, \"cac:Party\": {\"cac:PartyIdentification\": {\"cbc:ID\": \"ORG-0001\"}}}, \"cac:TenderingProcess\": {\"cbc:ProcedureCode\": {\"@listName\": \"procurement-procedure-type\", \"#text\": \"open\"}}, \"cac:ProcurementProject\": {\"cbc:ID\": \"26DEP04\", \"cbc:Name\": {\"@languageID\": \"FRA\", \"#text\": \"FOURNITURE ET LIVRAISON DE SIGNALISATION ROUTIERE VERTICALE\"}, \"cbc:Description\": {\"@languageID\": \"FRA\", \"#text\": \"FOURNITURE ET LIVRAISON DE SIGNALISATION ROUTIÈRE VERTICALE\"}, \"cbc:ProcurementTypeCode\": {\"@listName\": \"contract-nature\", \"#text\": \"supplies\"}, \"cac:MainCommodityClassification\": {\"cbc:ItemClassificationCode\": {\"@listName\": \"cpv\", \"#text\": \"44423400\"}}}, \"cac:ProcurementProjectLot\": [{\"cbc:ID\": {\"@schemeName\": \"Lot\", \"#text\": \"LOT-0001\"}, \"cac:TenderingTerms\": {\"cbc:VariantConstraintCode\": {\"@listName\": \"permission\", \"#text\": \"not-allowed\"}, \"cac:CallForTendersDocumentReference\": {\"cbc:ID\": \"1\", \"cac:Attachment\": {\"cac:ExternalReference\": {\"cbc:URI\": \"https://marches.ternum-bfc.fr/entreprise/consultation/695043?orgAcronyme=q3m\"}}}}, \"cac:TenderingProcess\": {\"cac:TenderSubmissionDeadlinePeriod\": {\"cbc:EndDate\": \"2026-11-09+01:00\", \"cbc:EndTime\": \"12:00:00+02:00\"}}, \"cac:ProcurementProject\": {\"cbc:ID\": \"1\", \"cbc:Name\": {\"@languageID\": \"FRA\", \"#text\": \"Panneaux de signalisation de police et plaques de rue\"}, \"cbc:Description\": {\"@languageID\": \"FRA\", \"#text\": \"Ce lot comprend : - La signalisation de police certifiée, directionnelle certifiée et temporaire certifiée, y compris les plaques de rue.\"}, \"cbc:ProcurementTypeCode\": {\"@listName\": \"contract-nature\", \"#text\": \"supplies\"}, \"cac:MainCommodityClassification\": {\"cbc:ItemClassificationCode\": {\"@listName\": \"cpv\", \"#text\": \"44423400\"}}, \"cac:PlannedPeriod\": {\"cbc:DurationMeasure\": {\"@unitCode\": \"MONTH\", \"#text\": \"48\"}}, \"cbc:SMESuitableIndicator\": \"true\"}}, {\"cbc:ID\": {\"@schemeName\": \"Lot\", \"#text\": \"LOT-0002\"}, \"cac:TenderingTerms\": {\"cbc:VariantConstraintCode\": {\"@listName\": \"permission\", \"#text\": \"not-allowed\"}, \"cac:CallForTendersDocumentReference\": {\"cbc:ID\": \"1\", \"cac:Attachment\": {\"cac:ExternalReference\": {\"cbc:URI\": \"https://marches.ternum-bfc.fr/entreprise/consultation/695043?orgAcronyme=q3m\"}}}}, \"cac:TenderingProcess\": {\"cac:TenderSubmissionDeadlinePeriod\": {\"cbc:EndDate\": \"2026-11-09+01:00\", \"cbc:EndTime\": \"12:00:00+02:00\"}}, \"cac:ProcurementProject\": {\"cbc:ID\": \"2\", \"cbc:Name\": {\"@languageID\": \"FRA\", \"#text\": \"Panneaux de signalisation plastique, bornes et équipements de sécurité\"}, \"cbc:Description\": {\"@languageID\": \"FRA\", \"#text\": \"Ce lot comprend, entre autres, les éléments de sécurité, les balisages de chantiers, les ralentisseurs.\"}, \"cbc:ProcurementTypeCode\": {\"@listName\": \"contract-nature\", \"#text\": \"supplies\"}, \"cac:MainCommodityClassification\": {\"cbc:ItemClassificationCode\": {\"@listName\": \"cpv\", \"#text\": \"44423400\"}}, \"cac:PlannedPeriod\": {\"cbc:DurationMeasure\": {\"@unitCode\": \"MONTH\", \"#text\": \"48\"}}, \"cbc:SMESuitableIndicator\": \"true\"}}]}}}",
+   "url_avis": "https://www.boamp.fr/pages/avis/?q=idweb:26-98309"
+  },
+  {
+   "idweb": "26-93392",
+   "objet": "FOURNITURE ET LIVRAISON DE SIGNALISATION ROUTIERE VERTICALE",
+   "famille": "JOUE",
+   "code_departement": [
+    "58"
+   ],
+   "dateparution": "2026-10-01",
+   "datelimitereponse": "2026-11-02T10:00:00+00:00",
+   "nomacheteur": "Ville de Nevers",
+   "nature": "APPEL_OFFRE",
+   "nature_libelle": "Avis de marché",
+   "etat": "INITIAL",
+   "donnees": null,
+   "url_avis": "https://www.boamp.fr/pages/avis/?q=idweb:26-93392",
+   "_note": "Version d'origine simplifiée (reconstituée pour le test du rectificatif)."
+  },
+  {
+   "idweb": "26-98298",
+   "objet": "Marché de services relatif au tri, au traitement, à la valorisation, au stockage et à l’enfouissement des Déchets",
+   "famille": "JOUE",
+   "code_departement": [
+    "974"
+   ],
+   "dateparution": "2026-10-13",
+   "nomacheteur": "SYDNE",
+   "nature": "ATTRIBUTION",
+   "nature_libelle": "Résultat de marché",
+   "etat": "INITIAL",
+   "type_marche_facette": [
+    "Services"
+   ],
+   "donnees": "{\"EFORMS\": {\"ContractAwardNotice\": {\"ext:UBLExtensions\": {\"ext:UBLExtension\": {\"ext:ExtensionContent\": {\"efext:EformsExtension\": {\"efac:NoticeResult\": {\"cbc:TotalAmount\": {\"@currencyID\": \"EUR\", \"#text\": \"31302994\"}, \"efac:LotResult\": {\"cbc:ID\": {\"@schemeName\": \"RES\", \"#text\": \"RES-0001\"}, \"efac:ReceivedSubmissionsStatistics\": {\"efbc:StatisticsCode\": {\"@listName\": \"received-submission-type\", \"#text\": \"tenders\"}, \"efbc:StatisticsNumeric\": \"1\"}, \"efac:TenderLot\": {\"cbc:ID\": \"LOT-0001\"}}, \"efac:TenderingParty\": {\"cbc:ID\": {\"@schemeName\": \"TPA\", \"#text\": \"TPA-0001\"}, \"efac:Tenderer\": {\"cbc:ID\": \"ORG-0003\"}}}, \"efac:NoticeSubType\": {\"cbc:SubTypeCode\": {\"@listName\": \"notice-subtype\", \"#text\": \"29\"}}, \"efac:Organizations\": {\"efac:Organization\": [{\"efac:Company\": {\"cbc:WebsiteURI\": \"https://marchespublics.sydne.fr/\", \"cac:PartyIdentification\": {\"cbc:ID\": {\"@schemeName\": \"organization\", \"#text\": \"ORG-0001\"}}, \"cac:PartyName\": {\"cbc:Name\": {\"@languageID\": \"FRA\", \"#text\": \"SYDNE\"}}, \"cac:PostalAddress\": {\"cbc:CityName\": \"97441\", \"cbc:PostalZone\": \"97441\", \"cac:Country\": {\"cbc:IdentificationCode\": {\"@listName\": \"country\", \"#text\": \"FRA\"}}}}}, {\"efac:Company\": {\"cac:PartyIdentification\": {\"cbc:ID\": {\"@schemeName\": \"organization\", \"#text\": \"ORG-0002\"}}, \"cac:PartyName\": {\"cbc:Name\": {\"@languageID\": \"FRA\", \"#text\": \"Tribunal administratif de la Réunion,\"}}, \"cac:PostalAddress\": {\"cbc:CityName\": \"Saint Denis\", \"cbc:PostalZone\": \"97400\", \"cac:Country\": {\"cbc:IdentificationCode\": {\"@listName\": \"country\", \"#text\": \"FRA\"}}}}}, {\"efac:Company\": {\"cac:PartyIdentification\": {\"cbc:ID\": {\"@schemeName\": \"organization\", \"#text\": \"ORG-0003\"}}, \"cac:PartyName\": {\"cbc:Name\": {\"@languageID\": \"FRA\", \"#text\": \"SUEZ RV REUNION\"}}, \"cac:PostalAddress\": {\"cbc:CityName\": \"SAINTE-MARIE\", \"cbc:PostalZone\": \"97438\", \"cac:Country\": {\"cbc:IdentificationCode\": {\"@listName\": \"country\", \"#text\": \"FRA\"}}}}}]}}}}}, \"cbc:NoticeTypeCode\": {\"@listName\": \"result\", \"#text\": \"can-standard\"}, \"cac:ContractingParty\": {\"cac:Party\": {\"cac:PartyIdentification\": {\"cbc:ID\": \"ORG-0001\"}}}, \"cac:ProcurementProject\": {\"cbc:ID\": \"2026-01-AO\", \"cbc:Name\": {\"@languageID\": \"FRA\", \"#text\": \"Marché de services relatif au tri, au traitement, à la valorisation, au stockage et à l’enfouissement des Déchets\"}, \"cbc:Description\": {\"@languageID\": \"FRA\", \"#text\": \"Le contrat est un marché de prestations de service ayant pour objet le tri, le traitement, la valorisation, le stockage et l’enfouissement des déchets.\"}, \"cbc:ProcurementTypeCode\": {\"@listName\": \"contract-nature\", \"#text\": \"services\"}, \"cac:MainCommodityClassification\": {\"cbc:ItemClassificationCode\": {\"@listName\": \"cpv\", \"#text\": \"90513000\"}}}, \"cac:ProcurementProjectLot\": {\"cbc:ID\": {\"@schemeName\": \"Lot\", \"#text\": \"LOT-0000\"}, \"cac:TenderingTerms\": {\"cbc:VariantConstraintCode\": {\"@listName\": \"permission\", \"#text\": \"not-allowed\"}, \"cac:AwardingTerms\": {\"cac:AwardingCriterion\": {\"cac:SubordinateAwardingCriterion\": [{\"ext:UBLExtensions\": {\"ext:UBLExtension\": {\"ext:ExtensionContent\": {\"efext:EformsExtension\": {\"efac:AwardCriterionParameter\": {\"efbc:ParameterCode\": {\"@listName\": \"number-weight\", \"#text\": \"per-exa\"}, \"efbc:ParameterNumeric\": \"55\"}}}}}, \"cbc:AwardingCriterionTypeCode\": {\"@listName\": \"award-criterion-type\", \"#text\": \"cost\"}, \"cbc:Description\": {\"@languageID\": \"FRA\", \"#text\": \"Coût global des prestations\"}}, {\"ext:UBLExtensions\": {\"ext:UBLExtension\": {\"ext:ExtensionContent\": {\"efext:EformsExtension\": {\"efac:AwardCriterionParameter\": {\"efbc:ParameterCode\": {\"@listName\": \"number-weight\", \"#text\": \"per-exa\"}, \"efbc:ParameterNumeric\": \"40\"}}}}}, \"cbc:AwardingCriterionTypeCode\": {\"@listName\": \"award-criterion-type\", \"#text\": \"quality\"}, \"cbc:Description\": {\"@languageID\": \"FRA\", \"#text\": \"Qualité technique\"}}, {\"ext:UBLExtensions\": {\"ext:UBLExtension\": {\"ext:ExtensionContent\": {\"efext:EformsExtension\": {\"efac:AwardCriterionParameter\": {\"efbc:ParameterCode\": {\"@listName\": \"number-weight\", \"#text\": \"per-exa\"}, \"efbc:ParameterNumeric\": \"5\"}}}}}, \"cbc:AwardingCriterionTypeCode\": {\"@listName\": \"award-criterion-type\", \"#text\": \"quality\"}, \"cbc:Description\": {\"@languageID\": \"FRA\", \"#text\": \"Performances garanties\"}}]}}}, \"cac:TenderingProcess\": {}, \"cac:ProcurementProject\": {\"cbc:ID\": \"0\", \"cbc:Name\": {\"@languageID\": \"FRA\", \"#text\": \"Marché de services relatif au tri, au traitement, à la valorisation, au stockage et à l’enfouissement des Déchets\"}, \"cbc:Description\": {\"@languageID\": \"FRA\", \"#text\": \"Le contrat est un marché de prestations de service ayant pour objet le tri, le traitement, la valorisation, le stockage et l’enfouissement des déchets.\"}, \"cbc:ProcurementTypeCode\": {\"@listName\": \"contract-nature\", \"#text\": \"services\"}, \"cac:MainCommodityClassification\": {\"cbc:ItemClassificationCode\": {\"@listName\": \"cpv\", \"#text\": \"90513000\"}}, \"cac:PlannedPeriod\": {\"cbc:DurationMeasure\": {\"@unitCode\": \"MONTH\", \"#text\": \"12\"}}}}, \"cac:TenderResult\": {\"cbc:AwardDate\": \"2000-01-01+01:00\"}}}}",
+   "url_avis": "https://www.boamp.fr/pages/avis/?q=idweb:26-98298"
+  }
+ ]
+}

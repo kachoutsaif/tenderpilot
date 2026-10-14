@@ -21,6 +21,8 @@ class Notice:
     deadline: str | None = None
     url: str | None = None
     raw: dict[str, Any] = field(default_factory=dict)
+    # identifiants des avis remplacés (un rectificatif remplace l'avis d'origine)
+    replaces: list[str] = field(default_factory=list)
 
 
 @dataclass

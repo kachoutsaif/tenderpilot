@@ -20,6 +20,7 @@ from tenderpilot.rag.prompt import NOT_FOUND, build_messages, extract_citations
 class VectorStore(Protocol):
     def search(self, query_vector: np.ndarray, k: int = 5) -> list[RetrievedChunk]: ...
     def upsert_notice(self, notice: Notice, chunks, vectors) -> None: ...
+    def delete_notices(self, notice_ids: list[str]) -> int: ...
 
 
 def ingest_notice(
@@ -29,7 +30,13 @@ def ingest_notice(
     max_chars: int = 1200,
     overlap: int = 200,
 ) -> int:
-    """Découpe, vectorise et enregistre un avis. Renvoie le nombre de morceaux."""
+    """Découpe, vectorise et enregistre un avis. Renvoie le nombre de morceaux.
+
+    Si l'avis est un rectificatif, l'avis d'origine qu'il remplace est supprimé :
+    la base ne garde que la version à jour du marché.
+    """
+    if notice.replaces:
+        store.delete_notices(notice.replaces)
     chunks = chunk_notice(notice, max_chars=max_chars, overlap=overlap)
     if not chunks:
         return 0

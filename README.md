@@ -27,7 +27,7 @@ Question ──► FastAPI /ask ──► top-k morceaux ──► LLM (Groq) �
 | API | FastAPI | Rapide, typée, documentation automatique sur `/docs` |
 | Base vectorielle | PostgreSQL + pgvector | Une seule base pour les données et les vecteurs ; même techno en local et sur AWS (RDS) |
 | Embeddings | FastEmbed, modèle multilingue | Tourne en local sur CPU, pas de coût, gère le français |
-| LLM | Llama 3.3 70B via Groq (API compatible OpenAI) | Gratuit pour démarrer ; fournisseur interchangeable par configuration |
+| LLM | gpt-oss-120b via Groq (API compatible OpenAI) | Gratuit pour démarrer ; fournisseur interchangeable par configuration |
 | Qualité | pytest + ruff + GitHub Actions | Tests à chaque push, y compris contre un vrai pgvector |
 
 ## Démarrage rapide

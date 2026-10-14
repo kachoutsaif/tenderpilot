@@ -18,7 +18,7 @@ FIXTURES = Path(__file__).parent / "fixtures"
 class FakeEmbedder:
     """Sac de mots haché : deux textes qui partagent des mots ont des vecteurs proches."""
 
-    dim = 64
+    dim = 512  # assez grand pour limiter les collisions du hachage
 
     def embed(self, texts):
         vectors = []
@@ -42,6 +42,13 @@ class InMemoryStore:
         self.notices[notice.id] = notice
         self.rows = [r for r in self.rows if r[0].notice_id != notice.id]
         self.rows += list(zip(chunks, vectors, strict=True))
+
+    def delete_notices(self, notice_ids):
+        removed = [i for i in notice_ids if i in self.notices]
+        for i in removed:
+            del self.notices[i]
+        self.rows = [r for r in self.rows if r[0].notice_id not in removed]
+        return len(removed)
 
     def search(self, query_vector, k=5):
         scored = sorted(
