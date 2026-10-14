@@ -1,0 +1,12 @@
+// Jeu d'évaluation TenderPilot : une question par ligne (JSON). Les lignes « // » sont des commentaires.
+// expected = idweb des avis qui DOIVENT être retrouvés. Vérifiez chaque avis sur boamp.fr.
+// kind = recherche (un avis précis) | liste (plusieurs avis) | filtre (contrainte chiffrée) | hors_sujet
+// Les 8 premières questions viennent de vos premiers tests du 14/10/2026 : complétez jusqu'à ~50.
+{"id": "q01", "question": "Quels marchés de signalisation routière sont ouverts ?", "expected": ["26-98309"], "kind": "recherche", "notes": "Ville de Nevers, 2 lots"}
+{"id": "q02", "question": "La ville de Nevers a-t-elle publié un marché de panneaux de signalisation ?", "expected": ["26-98309"], "kind": "recherche", "notes": "rectificatif : report de la date limite"}
+{"id": "q03", "question": "Y a-t-il un marché de nettoyage des locaux et de la vitrerie à Maubeuge ?", "expected": ["26-98519"], "kind": "recherche", "notes": "2 lots"}
+{"id": "q04", "question": "Quels marchés concernent la propreté des espaces publics ?", "expected": ["26-98400"], "kind": "recherche", "notes": "Décines-Charpieu, marché réservé (insertion)"}
+{"id": "q05", "question": "Quels marchés de nettoyage sont ouverts ?", "expected": ["26-98519", "26-98400"], "kind": "liste", "notes": "à compléter avec find_notices.py nettoyage"}
+{"id": "q06", "question": "Quels marchés de fourniture de matériel informatique sont ouverts ?", "expected": ["26-98537", "26-98342"], "kind": "liste", "notes": "SMICVAL + CAIH ; vérifier s'il y en a d'autres"}
+{"id": "q07", "question": "Quels marchés informatiques ont une durée de plus de 24 mois ?", "expected": ["26-98537", "26-98342"], "kind": "filtre", "notes": "26-98422 (veille média) n'est PAS informatique"}
+{"id": "q08", "question": "Quel est le prix du marché de construction du stade olympique de Marseille ?", "expected": [], "kind": "hors_sujet", "notes": "doit répondre : je ne trouve pas"}

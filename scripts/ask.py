@@ -12,6 +12,7 @@ from tenderpilot.config import get_settings
 from tenderpilot.rag.embeddings import FastEmbedEmbedder
 from tenderpilot.rag.llm import OpenAICompatibleLLM
 from tenderpilot.rag.pipeline import answer_question
+from tenderpilot.rag.prompt import group_by_notice
 from tenderpilot.store import PgVectorStore
 
 
@@ -31,8 +32,9 @@ def main() -> None:
 
     print(f"\n{answer.text}\n")
     print("Sources citées :")
-    for c in answer.citations:
-        print(f"  [{c.number}] avis {c.notice_id} — {c.title}")
+    for numbers, c in group_by_notice(answer.citations):
+        refs = "".join(f"[{n}]" for n in numbers)
+        print(f"  {refs} avis {c.notice_id} — {c.title}")
         if c.url:
             print(f"      {c.url}")
     if answer.invalid_citations:

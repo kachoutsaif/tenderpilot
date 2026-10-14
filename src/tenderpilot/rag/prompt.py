@@ -41,6 +41,17 @@ def build_messages(question: str, chunks: list[RetrievedChunk]) -> list[dict[str
     return [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": user}]
 
 
+def group_by_notice(citations: list[Citation]) -> list[tuple[list[int], Citation]]:
+    """Regroupe les citations qui pointent vers le même avis : [4][5] -> un seul avis."""
+    groups: dict[str, tuple[list[int], Citation]] = {}
+    for c in citations:
+        if c.notice_id in groups:
+            groups[c.notice_id][0].append(c.number)
+        else:
+            groups[c.notice_id] = ([c.number], c)
+    return list(groups.values())
+
+
 def extract_citations(
     answer: str, chunks: list[RetrievedChunk], excerpt_chars: int = 240
 ) -> tuple[list[Citation], list[int]]:

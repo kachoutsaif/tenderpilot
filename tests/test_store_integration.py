@@ -67,3 +67,12 @@ def test_delete_notices(pg_store, sample_records):
     notices, _ = store.count()
     assert notices == 1
     assert store.delete_notices([]) == 0
+
+
+def test_search_text(pg_store, sample_records):
+    store, embedder = pg_store
+    for record in sample_records[:3]:
+        ingest_notice(record_to_notice(record), embedder, store)
+    rows = store.search_text(["maintenance", "serveurs"])
+    assert [r["id"] for r in rows] == ["TEST-0002"]
+    assert store.search_text(["introuvable-xyz"]) == []

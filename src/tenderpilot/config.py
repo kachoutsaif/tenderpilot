@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     llm_api_key: str = ""
     llm_base_url: str = "https://api.groq.com/openai/v1"
     llm_model: str = "openai/gpt-oss-120b"
+    # modèle utilisé comme juge pendant l'évaluation (par défaut : le même que LLM_MODEL)
+    judge_model: str | None = None
 
     embedding_model: str = DEFAULT_MODEL
     embedding_cache_dir: str | None = None

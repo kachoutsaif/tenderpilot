@@ -71,6 +71,16 @@ docker compose exec db createdb -U tender tenderpilot_test
 TEST_DATABASE_URL=postgresql://tender:tender@localhost:5432/tenderpilot_test pytest -m integration
 ```
 
+## Évaluation (semaine 2)
+
+```bash
+python scripts/find_notices.py nettoyage            # trouver les avis pour le jeu d'évaluation
+python scripts/evaluate.py --label naif             # hit@k, recall@k, MRR (sans LLM)
+python scripts/evaluate.py --label naif --with-llm  # + fidélité (LLM juge), hors sujet, latence
+```
+Le jeu de questions est dans `eval/questions.jsonl`, les résultats dans `eval/results/`.
+Guide complet : `docs/SEMAINE_2.md`.
+
 ## Structure
 
 ```
@@ -82,6 +92,8 @@ src/tenderpilot/
   rag/prompt.py          # prompt + vérification des citations
   rag/llm.py             # client LLM compatible OpenAI
   rag/pipeline.py        # ingestion et question-réponse de bout en bout
+  ingestion/eforms.py    # lecture du format européen eForms
+  evaluation/            # métriques, juge de fidélité, lancement de l'évaluation
   store.py               # PostgreSQL + pgvector
   api/main.py            # API FastAPI
 scripts/                 # inspect, ingest, ask

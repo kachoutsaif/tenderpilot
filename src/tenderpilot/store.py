@@ -128,6 +128,23 @@ class PgVectorStore:
             for r in rows
         ]
 
+    def search_text(self, words: list[str], limit: int = 30) -> list[dict]:
+        """Avis contenant tous les mots donnés (aide à la préparation de l'évaluation)."""
+        conditions = " AND ".join(["c.content ILIKE %s"] * len(words)) or "TRUE"
+        rows = self.conn.execute(
+            f"""
+            SELECT n.id, n.title, n.buyer, n.deadline, count(*) AS morceaux
+            FROM chunks c JOIN notices n ON n.id = c.notice_id
+            WHERE {conditions}
+            GROUP BY n.id, n.title, n.buyer, n.deadline
+            ORDER BY n.id
+            LIMIT %s
+            """,
+            [f"%{w}%" for w in words] + [limit],
+        ).fetchall()
+        keys = ("id", "title", "buyer", "deadline", "morceaux")
+        return [dict(zip(keys, r, strict=True)) for r in rows]
+
     def list_notices(self, limit: int = 20) -> list[dict]:
         rows = self.conn.execute(
             "SELECT id, title, buyer, published, deadline, url FROM notices "

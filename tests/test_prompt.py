@@ -30,3 +30,16 @@ def test_valid_and_invalid_citations_are_separated():
 def test_answer_without_citation():
     valid, invalid = extract_citations(NOT_FOUND, _chunks(3))
     assert valid == [] and invalid == []
+
+
+def test_group_by_notice_merges_same_notice():
+    from tenderpilot.models import Citation
+    from tenderpilot.rag.prompt import group_by_notice
+
+    cites = [
+        Citation(1, "A", "t", None, ""),
+        Citation(4, "B", "t", None, ""),
+        Citation(5, "B", "t", None, ""),
+    ]
+    groups = group_by_notice(cites)
+    assert [(nums, c.notice_id) for nums, c in groups] == [([1], "A"), ([4, 5], "B")]
