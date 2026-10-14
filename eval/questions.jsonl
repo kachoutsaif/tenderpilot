@@ -10,3 +10,26 @@
 {"id": "q06", "question": "Quels marchés de fourniture de matériel informatique sont ouverts ?", "expected": ["26-98537", "26-98342"], "kind": "liste", "notes": "SMICVAL + CAIH ; vérifier s'il y en a d'autres"}
 {"id": "q07", "question": "Quels marchés informatiques ont une durée de plus de 24 mois ?", "expected": ["26-98537", "26-98342"], "kind": "filtre", "notes": "26-98422 (veille média) n'est PAS informatique"}
 {"id": "q08", "question": "Quel est le prix du marché de construction du stade olympique de Marseille ?", "expected": [], "kind": "hors_sujet", "notes": "doit répondre : je ne trouve pas"}
+// ---- Ajout du 14/10 : questions construites à partir de find_notices (à vérifier sur boamp.fr) ----
+{"id": "q09", "question": "Une commune cherche-t-elle une entreprise pour nettoyer ses vitres et ses brise-soleil ?", "expected": ["26-98391"], "kind": "recherche", "notes": "L'Haÿ-les-Roses"}
+{"id": "q10", "question": "Y a-t-il un marché de lavage des conteneurs de tri des déchets ?", "expected": ["26-98454"], "kind": "recherche", "notes": "synonyme : 'colonnes d'apport volontaire' dans l'avis"}
+{"id": "q11", "question": "Qui cherche un prestataire de ménage pour un établissement d'enseignement agricole ?", "expected": ["26-99151"], "kind": "recherche", "notes": "Bergerie nationale, 'zootechnique' : test de compréhension"}
+{"id": "q12", "question": "Le Havre a-t-il publié un marché de balayage mécanique ?", "expected": ["26-98934"], "kind": "recherche", "notes": ""}
+{"id": "q13", "question": "Quels marchés d'entretien ménager de bâtiments sont ouverts ?", "expected": ["26-98391", "26-98519", "26-99151"], "kind": "liste", "notes": "uniquement des services de ménage ; les travaux qui mentionnent le nettoyage NE comptent PAS"}
+{"id": "q14", "question": "Quelle mairie cherche une entreprise de marquage au sol des routes ?", "expected": ["26-99270"], "kind": "recherche", "notes": "Cernay ; synonyme de 'marquage routier'"}
+{"id": "q15", "question": "Y a-t-il un accord-cadre de VRD dans le Val-d'Oise ?", "expected": ["26-98490"], "kind": "recherche", "notes": "sigle VRD = voiries et réseaux divers ; Magny-en-Vexin (95) à vérifier"}
+{"id": "q16", "question": "Un département construit-il une piste cyclable ?", "expected": ["26-99123"], "kind": "recherche", "notes": "'liaison douce' dans l'avis : test de synonyme ; Manche"}
+{"id": "q17", "question": "Quels marchés de travaux sur les réseaux d'eau potable ou d'assainissement sont ouverts ?", "expected": ["26-99314", "26-98961", "26-99007"], "kind": "liste", "notes": "Gap, Concarneau (station de pompage), Sisteron (canalisation) : à vérifier"}
+{"id": "q18", "question": "Quels marchés de travaux de voirie sont ouverts ?", "expected": ["26-98490", "26-98864", "26-99022", "26-99123", "26-99270", "26-99304", "26-99349", "26-99363"], "kind": "liste", "notes": "liste longue (> 5) : teste le recall ; vérifier chaque avis"}
+{"id": "q19", "question": "Une ville achète-t-elle des équipements de cuisine pour ses cantines ?", "expected": ["26-98424"], "kind": "recherche", "notes": "Villeneuve-Saint-Georges"}
+{"id": "q20", "question": "Quels marchés de restauration d'églises ou de patrimoine religieux sont ouverts ?", "expected": ["26-99042", "26-99167", "26-99066"], "kind": "liste", "notes": "piège : 'restauration' au sens patrimoine, PAS repas ; Brûlon (prieuré) à vérifier"}
+{"id": "q21", "question": "Quels marchés de traiteur ou de repas sont ouverts ?", "expected": ["26-98580"], "kind": "liste", "notes": "piège inverse : les églises ne doivent PAS sortir ; CPAM de Paris ; vérifier s'il y en a d'autres"}
+{"id": "q22", "question": "Quelles communes ont lancé un marché d'assurances ?", "expected": ["26-98312", "26-98355", "26-98442", "26-98478", "26-98485", "26-98493", "26-98528", "26-98859", "26-98870", "26-98874"], "kind": "liste", "notes": "10 avis : impossible à couvrir avec k=5, recall attendu faible"}
+{"id": "q23", "question": "Un hôpital de Lozère cherche-t-il un assureur ?", "expected": ["26-98497"], "kind": "recherche", "notes": ""}
+{"id": "q24", "question": "Y a-t-il une offre de location longue durée de véhicules à La Réunion ?", "expected": ["26-98524"], "kind": "recherche", "notes": "CMAR Réunion"}
+{"id": "q25", "question": "Qui veut acheter un système de vote électronique ?", "expected": ["26-98438"], "kind": "recherche", "notes": "CNRS"}
+{"id": "q26", "question": "Y a-t-il un marché pour dématérialiser les fiches de paie ?", "expected": ["26-98489"], "kind": "recherche", "notes": "synonyme : 'bulletins de paie' dans l'avis"}
+{"id": "q27", "question": "Un lycée agricole de l'Oise renouvelle-t-il son infrastructure réseau ?", "expected": ["26-99282"], "kind": "recherche", "notes": "sigle EPLEFPA = établissement public agricole ; à vérifier"}
+{"id": "q28", "question": "Y a-t-il des marchés de nettoyage en Belgique ?", "expected": [], "kind": "hors_sujet", "notes": "le BOAMP ne couvre que la France"}
+{"id": "q29", "question": "Quelle entreprise a remporté le marché d'assurances des Mureaux ?", "expected": [], "kind": "hors_sujet", "notes": "marché encore ouvert : aucun titulaire ne doit être inventé"}
+{"id": "q30", "question": "Quel est le montant attribué au marché de signalisation de Nevers ?", "expected": [], "kind": "hors_sujet", "notes": "marché ouvert, aucun montant attribué"}

@@ -1,0 +1,284 @@
+{
+  "label": "naif",
+  "date": "2026-10-14T03:52:42",
+  "config": {
+    "k": 5,
+    "embedding_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    "llm_model": "openai/gpt-oss-120b",
+    "chunk_size": 1200,
+    "chunk_overlap": 200
+  },
+  "summary": {
+    "global": {
+      "questions": 8,
+      "hit@k": 1.0,
+      "recall@k": 0.857,
+      "mrr": 0.786,
+      "fidelite": 0.948,
+      "hors_sujet_ok": 1.0,
+      "citations_invalides": 0,
+      "erreurs": 0,
+      "latence_moy_s": 5.65,
+      "latence_p95_s": 11.3
+    },
+    "par_type": {
+      "filtre": {
+        "questions": 1,
+        "hit@k": 1.0,
+        "recall@k": 1.0,
+        "mrr": 0.5,
+        "fidelite": 1.0,
+        "hors_sujet_ok": null,
+        "citations_invalides": 0,
+        "erreurs": 0,
+        "latence_moy_s": 5.45,
+        "latence_p95_s": 5.45
+      },
+      "hors_sujet": {
+        "questions": 1,
+        "hit@k": null,
+        "recall@k": null,
+        "mrr": null,
+        "fidelite": 1.0,
+        "hors_sujet_ok": 1.0,
+        "citations_invalides": 0,
+        "erreurs": 0,
+        "latence_moy_s": 1.0,
+        "latence_p95_s": 1.0
+      },
+      "liste": {
+        "questions": 2,
+        "hit@k": 1.0,
+        "recall@k": 0.5,
+        "mrr": 0.75,
+        "fidelite": 0.833,
+        "hors_sujet_ok": null,
+        "citations_invalides": 0,
+        "erreurs": 0,
+        "latence_moy_s": 10.99,
+        "latence_p95_s": 11.3
+      },
+      "recherche": {
+        "questions": 4,
+        "hit@k": 1.0,
+        "recall@k": 1.0,
+        "mrr": 0.875,
+        "fidelite": 0.979,
+        "hors_sujet_ok": null,
+        "citations_invalides": 0,
+        "erreurs": 0,
+        "latence_moy_s": 4.2,
+        "latence_p95_s": 7.71
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "q01",
+      "kind": "recherche",
+      "question": "Quels marchés de signalisation routière sont ouverts ?",
+      "expected": [
+        "26-98309"
+      ],
+      "retrieved": [
+        "26-98567",
+        "26-98309",
+        "26-98506",
+        "26-99206",
+        "26-98447"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 0.5,
+      "search_seconds": 0.05324612100230297,
+      "answer": "- **FOURNITURE ET LIVRAISON DE SIGNALISATION ROUTIÈRE VERTICALE** – Ville de Nevers (département 58) ; procédure **Ouverte**, date limite de remise des offres le 09 novembre 2026 ; marché adapté aux PME [2].\n\n- **Réalisation de travaux de modernisation de la ZA Victorine Taïlou** – SPL Grand Ouest (département 974) ; procédure **Ouverte**, date limite de remise des offres le 12 novembre 2026 ; le lot 1 comprend des travaux de signalisation parmi d’autres prestations de voirie et génie civil [3].",
+      "answer_seconds": 2.1155689199986227,
+      "faithfulness": 0.9166666666666666,
+      "unsupported": [
+        "Le lot 1 comprend des travaux de signalisation parmi d’autres prestations de voirie et génie civil."
+      ],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q02",
+      "kind": "recherche",
+      "question": "La ville de Nevers a-t-elle publié un marché de panneaux de signalisation ?",
+      "expected": [
+        "26-98309"
+      ],
+      "retrieved": [
+        "26-98309",
+        "26-98883",
+        "26-99208",
+        "26-98641",
+        "26-99378"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.02140931800022372,
+      "answer": "Oui. La Ville de Nevers a publié un avis de marché portant sur la **fourniture et la livraison de signalisation routière verticale**, dont le lot 1 comprend les panneaux de signalisation de police et les plaques de rue [1].",
+      "answer_seconds": 1.07682579700122,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q03",
+      "kind": "recherche",
+      "question": "Y a-t-il un marché de nettoyage des locaux et de la vitrerie à Maubeuge ?",
+      "expected": [
+        "26-98519"
+      ],
+      "retrieved": [
+        "26-98519",
+        "26-99250",
+        "26-99251",
+        "26-98400"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.010396944999229163,
+      "answer": "Oui, il existe un marché d’entretien et de nettoyage des locaux ainsi que de la vitrerie à Maubeuge : il porte sur le centre technique municipal, la Police municipale et le Centre multi‑accueil de la Ville de Maubeuge【1】.",
+      "answer_seconds": 5.898195043002488,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q04",
+      "kind": "recherche",
+      "question": "Quels marchés concernent la propreté des espaces publics ?",
+      "expected": [
+        "26-98400"
+      ],
+      "retrieved": [
+        "26-98400",
+        "26-98519"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.007807095000316622,
+      "answer": "Le seul avis qui porte sur la propreté des espaces publics (y compris les espaces verts) est :\n\n- **Avis 26‑98400 – Prestations de sur‑entretien et de propreté des espaces publics (dont espaces verts) de la Ville de Décines‑Charpieu** [1][3].\n\nLes autres avis (par ex. l’avis 26‑98519 de la Ville de Maubeuge) concernent l’entretien et le nettoyage de locaux et de vitrerie, pas la propreté des espaces publics.",
+      "answer_seconds": 7.708664527999645,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q05",
+      "kind": "liste",
+      "question": "Quels marchés de nettoyage sont ouverts ?",
+      "expected": [
+        "26-98519",
+        "26-98400"
+      ],
+      "retrieved": [
+        "26-98400",
+        "26-98351",
+        "26-99250"
+      ],
+      "hit": 1.0,
+      "recall": 0.5,
+      "rr": 1.0,
+      "search_seconds": 0.011258056001679506,
+      "answer": "**Marché de nettoyage ouvert :**\n\n- **Prestations de sur‑entretien et de propreté des espaces publics (dont espaces verts) – Ville de Décines‑Charpieu**  \n  - Type : services de nettoyage/entretien.  \n  - Procédure : procédure ouverte.  \n  - Date de parution : 13 octobre 2026.  \n  - Date limite de réponse : 12 novembre 2026.  \n  - Lieu d’exécution : Décines‑Charpieu (69).  \n  - Réservé aux structures d’insertion ou aux entreprises adaptées (50 % de travailleurs handicapés ou défavorisés).  \n  - Montant estimé : 240 000 € pour 12 mois.  \n  - Critères d’attribution : valeur technique (50 %), développement durable (10 %), prix (40 %).  \n\nSources : [1][2][3]",
+      "answer_seconds": 11.297598067998479,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q06",
+      "kind": "liste",
+      "question": "Quels marchés de fourniture de matériel informatique sont ouverts ?",
+      "expected": [
+        "26-98537",
+        "26-98342"
+      ],
+      "retrieved": [
+        "26-98837",
+        "26-98342",
+        "26-99282",
+        "26-98935",
+        "26-98506"
+      ],
+      "hit": 1.0,
+      "recall": 0.5,
+      "rr": 0.5,
+      "search_seconds": 0.009094118999200873,
+      "answer": "Le seul avis portant sur la **fourniture de matériel informatique** et ouvert à la concurrence (procédure ouverte) est :\n\n- **Fourniture, intégration et maintenance de matériels et solutions de réseaux informatiques sécurisés pour les adhérents de la CAIH** (avis 26‑98342) ; il s’agit d’un marché de fournitures avec procédure ouverte [2].",
+      "answer_seconds": 10.67535968700031,
+      "faithfulness": 0.6666666666666666,
+      "unsupported": [
+        "Le seul avis portant sur la fourniture de matériel informatique et ouvert à la concurrence (procédure ouverte) est le marché de la CAIH (avis 26‑98342)."
+      ],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q07",
+      "kind": "filtre",
+      "question": "Quels marchés informatiques ont une durée de plus de 24 mois ?",
+      "expected": [
+        "26-98537",
+        "26-98342"
+      ],
+      "retrieved": [
+        "26-98422",
+        "26-98537",
+        "26-98334",
+        "26-99094",
+        "26-98342"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 0.5,
+      "search_seconds": 0.013352199999644654,
+      "answer": "Les marchés informatiques dont la durée dépasse 24 mois sont :\n\n- **Avis 26‑98422** – Fourniture de solutions de veille média, de revue de presse et de veille stratégique : durée de 48 mois pour les deux lots [1].\n\n- **Avis 26‑98537** – Fourniture de matériel informatique et logiciel : durée de 48 mois [2].\n\n- **Avis 26‑98342** – Fourniture, intégration et maintenance de matériels et solutions de réseaux informatiques sécurisés : durée de 48 mois [5].",
+      "answer_seconds": 5.4497153159973095,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q08",
+      "kind": "hors_sujet",
+      "question": "Quel est le prix du marché de construction du stade olympique de Marseille ?",
+      "expected": [],
+      "retrieved": [
+        "26-98402",
+        "26-98538",
+        "26-99192",
+        "26-98533",
+        "26-98307"
+      ],
+      "hit": null,
+      "recall": null,
+      "rr": null,
+      "search_seconds": 0.009928957999363774,
+      "answer": "Je ne trouve pas cette information dans les avis indexés.",
+      "answer_seconds": 0.9999938950022624,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": true,
+      "error": null
+    }
+  ]
+}
