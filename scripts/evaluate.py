@@ -76,11 +76,16 @@ def main() -> None:
     llm = judge = None
     if args.with_llm:
         llm = OpenAICompatibleLLM(api_key=s.llm_api_key, base_url=s.llm_base_url, model=s.llm_model)
+        judge_model = s.judge_model or s.llm_model
+        # gpt-oss est un modèle « qui réfléchit » : ses tokens de réflexion comptent dans
+        # max_tokens. Avec 2000, le JSON du juge était coupé sur les longues réponses.
+        judge_options = {"reasoning_effort": "low"} if "gpt-oss" in judge_model else {}
         judge = OpenAICompatibleLLM(
             api_key=s.llm_api_key,
             base_url=s.llm_base_url,
-            model=s.judge_model or s.llm_model,
-            max_tokens=2000,
+            model=judge_model,
+            max_tokens=4000,
+            **judge_options,
         )
 
     def progress(i, total, r):

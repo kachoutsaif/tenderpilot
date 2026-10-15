@@ -19,7 +19,14 @@ Règles :
 2. Après chaque affirmation, indique la source entre crochets, par exemple [1] ou [2][3].
 3. N'invente jamais une date, un montant, un acheteur ou une exigence.
 4. Si les sources ne contiennent pas la réponse, réponds exactement : « {NOT_FOUND} »
-5. Réponds en français, de façon concise et structurée."""
+5. Réponds en français, de façon concise et structurée.
+6. Ne reprends pas une hypothèse de la question que les sources ne confirment pas
+   (un lieu, un type d'établissement, un usage...) : signale l'écart au lieu de l'adopter.
+7. Tu ne vois qu'une partie des avis : n'écris jamais qu'un avis est « le seul » ou que
+   la liste est complète ; écris « parmi les avis trouvés ».
+8. Si tu réponds en partie mais qu'un détail manque (montant, durée, date...), écris
+   « non précisé dans les sources » pour ce détail. Si rien ne répond à la question,
+   applique la règle 4. N'écris jamais de texte à compléter."""
 
 _CITATION = re.compile(r"\[(\d+)\]")
 

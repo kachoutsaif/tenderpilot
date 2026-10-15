@@ -124,3 +124,24 @@ def test_errors_do_not_stop_evaluation(sample_records, embedder, store, tmp_path
     results, summary = run_evaluation(load_questions(path), embedder, store, llm=Broken())
     assert results[0].error.startswith("RuntimeError")
     assert summary["global"]["erreurs"] == 1
+
+
+class SequenceLLM:
+    """Renvoie les réponses données, dans l'ordre."""
+
+    def __init__(self, *replies):
+        self.replies = list(replies)
+        self.calls = 0
+
+    def complete(self, messages):
+        self.calls += 1
+        return self.replies.pop(0)
+
+
+def test_juge_retente_si_json_coupe():
+    judge = SequenceLLM(
+        '{"claims": [{"claim": "x", "supp',
+        '{"claims": [{"claim": "x", "supported": true}]}',
+    )
+    verdict = judge_answer(judge, "q", "Une réponse [1].", [])
+    assert verdict.faithfulness == 1.0 and judge.calls == 2

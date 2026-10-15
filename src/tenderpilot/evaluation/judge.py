@@ -24,6 +24,7 @@ JUDGE_PROMPT = """Tu es un évaluateur strict. On te donne des SOURCES et une R�
    Une affirmation est non soutenue si elle ajoute une information absente des sources,
    même plausible (par exemple le sens d'un sigle qui n'est pas écrit dans les sources).
 3. Ignore les formules de politesse et les phrases qui disent seulement ne pas savoir.
+4. Écris les affirmations en français.
 
 Réponds UNIQUEMENT avec un JSON de la forme :
 {"claims": [{"claim": "...", "supported": true}, {"claim": "...", "supported": false}]}"""
@@ -64,7 +65,11 @@ def parse_judgement(raw: str) -> Judgement:
 def judge_answer(llm, question: str, answer: str, sources: list[RetrievedChunk]) -> Judgement:
     if NOT_FOUND in answer and len(answer) < len(NOT_FOUND) + 40:
         return Judgement(faithfulness=1.0, claims=[], unsupported=[])
-    return parse_judgement(llm.complete(build_judge_messages(question, answer, sources)))
+    messages = build_judge_messages(question, answer, sources)
+    try:
+        return parse_judgement(llm.complete(messages))
+    except ValueError:  # JSON coupé ou absent (json.JSONDecodeError hérite de ValueError)
+        return parse_judgement(llm.complete(messages))  # une seule nouvelle tentative
 
 
 def says_not_found(answer: str) -> bool:

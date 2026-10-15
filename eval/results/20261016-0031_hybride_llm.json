@@ -1,0 +1,856 @@
+{
+  "label": "hybride_llm",
+  "date": "2026-10-16T00:31:16",
+  "config": {
+    "k": 5,
+    "retrieval_mode": "hybrid",
+    "embedding_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    "llm_model": "openai/gpt-oss-120b",
+    "chunk_size": 1200,
+    "chunk_overlap": 200
+  },
+  "summary": {
+    "global": {
+      "questions": 30,
+      "hit@k": 0.962,
+      "recall@k": 0.866,
+      "mrr": 0.779,
+      "fidelite": 0.974,
+      "hors_sujet_ok": 1.0,
+      "citations_invalides": 0,
+      "erreurs": 3,
+      "latence_moy_s": 1.31,
+      "latence_p95_s": 1.98
+    },
+    "par_type": {
+      "filtre": {
+        "questions": 1,
+        "hit@k": 1.0,
+        "recall@k": 1.0,
+        "mrr": 0.5,
+        "fidelite": 1.0,
+        "hors_sujet_ok": null,
+        "citations_invalides": 0,
+        "erreurs": 0,
+        "latence_moy_s": 1.37,
+        "latence_p95_s": 1.37
+      },
+      "hors_sujet": {
+        "questions": 4,
+        "hit@k": null,
+        "recall@k": null,
+        "mrr": null,
+        "fidelite": 1.0,
+        "hors_sujet_ok": 1.0,
+        "citations_invalides": 0,
+        "erreurs": 0,
+        "latence_moy_s": 0.84,
+        "latence_p95_s": 1.04
+      },
+      "liste": {
+        "questions": 8,
+        "hit@k": 1.0,
+        "recall@k": 0.691,
+        "mrr": 0.708,
+        "fidelite": 0.989,
+        "hors_sujet_ok": null,
+        "citations_invalides": 0,
+        "erreurs": 3,
+        "latence_moy_s": 1.65,
+        "latence_p95_s": 1.84
+      },
+      "recherche": {
+        "questions": 17,
+        "hit@k": 0.941,
+        "recall@k": 0.941,
+        "mrr": 0.828,
+        "fidelite": 0.961,
+        "hors_sujet_ok": null,
+        "citations_invalides": 0,
+        "erreurs": 0,
+        "latence_moy_s": 1.26,
+        "latence_p95_s": 1.98
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "q01",
+      "kind": "recherche",
+      "question": "Quels marchés de signalisation routière sont ouverts ?",
+      "expected": [
+        "26-98309"
+      ],
+      "retrieved": [
+        "26-98309",
+        "26-98567",
+        "26-98506",
+        "26-98457"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.03056604299990795,
+      "answer": "Les seuls avis portant sur des **marchés de signalisation routière** et indiqués comme **procédure ouverte** sont :\n\n| Avis | Acheteur | Objet | Procédure | Lots | Date limite de remise des offres |\n|------|----------|-------|-----------|------|-----------------------------------|\n| 26‑98309 | Ville de Nevers (58) | Fourniture et livraison de signalisation routière verticale | Procédure Ouverte | 2 lots (lot 1 : panneaux de signalisation de police et plaques de rue ; lot 2 : panneaux de signalisation plastique, bornes et équipements de sécurité) | 09/11/2026 à 12 h00 |\n\nSources : [1] ; [4]",
+      "answer_seconds": 1.9758380940000961,
+      "faithfulness": 0.875,
+      "unsupported": [
+        "The only avis on signalisation routière markets and indicated as procedure ouverte are 26‑98309."
+      ],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q02",
+      "kind": "recherche",
+      "question": "La ville de Nevers a-t-elle publié un marché de panneaux de signalisation ?",
+      "expected": [
+        "26-98309"
+      ],
+      "retrieved": [
+        "26-98309",
+        "26-98641",
+        "26-99208",
+        "26-99190",
+        "26-98883"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.022473493999996208,
+      "answer": "Oui. La Ville de Nevers a publié un avis de marché (procédure ouverte) pour la **fourniture et livraison de signalisation routière verticale**, dont le lot 1 comprend les **panneaux de signalisation de police** ainsi que les **plaques de rue**【1】.",
+      "answer_seconds": 1.9353762079999797,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q03",
+      "kind": "recherche",
+      "question": "Y a-t-il un marché de nettoyage des locaux et de la vitrerie à Maubeuge ?",
+      "expected": [
+        "26-98519"
+      ],
+      "retrieved": [
+        "26-98519",
+        "26-98400",
+        "26-98454",
+        "26-98391"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.026223009000091224,
+      "answer": "Oui, un marché public d’entretien et de nettoyage des locaux ainsi que de la vitrerie des bâtiments du centre technique municipal, de la Police municipale et du Centre multi‑accueil (CMA) a été publié pour la Ville de Maubeuge [1][2].",
+      "answer_seconds": 0.9013105619999351,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q04",
+      "kind": "recherche",
+      "question": "Quels marchés concernent la propreté des espaces publics ?",
+      "expected": [
+        "26-98400"
+      ],
+      "retrieved": [
+        "26-98400",
+        "26-98520"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.01886007999996764,
+      "answer": "Le seul marché répertorié qui porte sur la propreté des espaces publics est :\n\n- **Prestations de sur‑entretien et de propreté des espaces publics (dont espaces verts) de la Ville de Décines‑Charpieu** (avis 26‑98400) ; il s’agit d’un accord‑cadre mono‑attributaire visant le sur‑entretien et la propreté des espaces publics de la commune [1][2][3][4].",
+      "answer_seconds": 1.3822233289999986,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q05",
+      "kind": "liste",
+      "question": "Quels marchés de nettoyage sont ouverts ?",
+      "expected": [
+        "26-98519",
+        "26-98400"
+      ],
+      "retrieved": [
+        "26-98400",
+        "26-98519",
+        "26-98454",
+        "26-98391"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.018245610000008128,
+      "answer": "**Marchés de nettoyage actuellement ouverts (procédure ouverte) :**\n\n| Avis | Objet du marché | Acheteur | Type de prestations |\n|------|----------------|----------|---------------------|\n| 26‑98400 | Sur‑entretien et propreté des espaces publics (dont espaces verts) | Ville de Décines‑Charpieu (69) | Nettoyage urbain, espaces verts | [1] |\n| 26‑98519 | Entretien et nettoyage des locaux et vitrerie du centre technique municipal, de la Police municipale et du Centre multi‑accueil (CMA) | Ville de Maubeuge (59) – 2 lots (locaux administratifs/techniques et CMA) | Nettoyage de locaux et vitrerie | [2][4] |\n| 26‑98454 | Lavage intérieur et extérieur des colonnes d’apport volontaire (conteneurs, bornes) | Communauté d’agglomération du Cotentin (50) | Nettoyage urbain de conteneurs | [3] |\n| 26‑98391 | Nettoyage de vitres, encadrements de fenêtres et brises‑soleil des bâtiments | Mairie de L’Haÿ‑les‑Roses (94) | Nettoyage de façades et vitreries | [5] |\n\nTous ces avis précisent une **procédure ouverte** et concernent des prestations de nettoyage ou de propreté.",
+      "answer_seconds": 1.8167920119999508,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": "ValueError: Le juge n'a pas renvoyé de JSON"
+    },
+    {
+      "id": "q06",
+      "kind": "liste",
+      "question": "Quels marchés de fourniture de matériel informatique sont ouverts ?",
+      "expected": [
+        "26-98537",
+        "26-98342"
+      ],
+      "retrieved": [
+        "26-98537",
+        "26-98342",
+        "26-98422",
+        "26-98837",
+        "26-99282"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.02106129300000248,
+      "answer": "**Marchés de fourniture de matériel informatique ouverts (procédure ouverte)**  \n\n| Avis | Objet du marché | Acheteur | Type de marché | Durée | Montant estimé |\n|------|----------------|----------|----------------|-------|----------------|\n| 26‑98537 | Fourniture de matériel informatique et logiciel | SMICVAL du Libournais (Saint‑Denis‑de‑Pile) | Fournitures | 48 mois | 400 000 € | [1] |\n| 26‑98342 – Lot 1 & Lot 2 | Fourniture, intégration et maintenance de matériels et solutions de réseaux informatiques sécurisés (adhérents de la CAIH) | CAIH (Lyon) | Fournitures | 48 mois | 415 000 000 € | [2] |\n| 26‑99282 | Fourniture, installation, paramétrage, supervision et maintenance d’une infrastructure VPN inter‑sites pour les UFA du CFA Agricole Public des Hauts‑de‑France | EPLEFPA Oise | Fournitures | 48 mois | (montant indiqué dans l’avis) | [5] |\n\nCes trois avis portent tous sur la **fourniture de matériel informatique** (matériel, réseaux, VPN) et sont lancés sous **procédure ouverte**.",
+      "answer_seconds": 1.7928298650000443,
+      "faithfulness": 0.9444444444444444,
+      "unsupported": [
+        "The estimated amount of avis 26‑99282 is (montant indiqué dans l’avis)."
+      ],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q07",
+      "kind": "filtre",
+      "question": "Quels marchés informatiques ont une durée de plus de 24 mois ?",
+      "expected": [
+        "26-98537",
+        "26-98342"
+      ],
+      "retrieved": [
+        "26-98422",
+        "26-98342",
+        "26-98537",
+        "26-98489",
+        "26-98361"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 0.5,
+      "search_seconds": 0.021953655999936927,
+      "answer": "Les marchés informatiques dont la durée dépasse 24 mois sont :\n\n- **Avis 26‑98422** – Fourniture de solutions de veille média, de revue de presse et de veille stratégique : durée de 48 mois [1]  \n- **Avis 26‑98342** – Fourniture, intégration et maintenance de matériels et solutions de réseaux informatiques sécurisés : durée de 48 mois pour les lots 3, 4, 5 et 6 [2]  \n- **Avis 26‑98537** – Fourniture de matériel informatique et logiciel : durée de 48 mois [3]",
+      "answer_seconds": 1.3680228640000678,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q08",
+      "kind": "hors_sujet",
+      "question": "Quel est le prix du marché de construction du stade olympique de Marseille ?",
+      "expected": [],
+      "retrieved": [
+        "26-99353",
+        "26-99360",
+        "26-98402",
+        "26-99153",
+        "26-98538"
+      ],
+      "hit": null,
+      "recall": null,
+      "rr": null,
+      "search_seconds": 0.019553416999997353,
+      "answer": "Je ne trouve pas cette information dans les avis indexés.",
+      "answer_seconds": 0.7218621340000482,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": true,
+      "error": null
+    },
+    {
+      "id": "q09",
+      "kind": "recherche",
+      "question": "Une commune cherche-t-elle une entreprise pour nettoyer ses vitres et ses brise-soleil ?",
+      "expected": [
+        "26-98391"
+      ],
+      "retrieved": [
+        "26-98391",
+        "26-99196",
+        "26-98641",
+        "26-98400"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.02007156100012253,
+      "answer": "Oui. La mairie de L’Haÿ‑les‑Roses lance un marché de nettoyage des vitres, des encadrements de fenêtres et des brises‑soleil de ses bâtiments [1][4].",
+      "answer_seconds": 2.9442665970000235,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q10",
+      "kind": "recherche",
+      "question": "Y a-t-il un marché de lavage des conteneurs de tri des déchets ?",
+      "expected": [
+        "26-98454"
+      ],
+      "retrieved": [
+        "26-98495",
+        "26-98454",
+        "26-98351",
+        "26-98450"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 0.5,
+      "search_seconds": 0.025003980000064985,
+      "answer": "Oui, il existe un marché de lavage des conteneurs de tri : il s’agit des prestations de lavage intérieur et extérieur des colonnes d’apport volontaire (colonnes et bornes d’introduction destinées aux collectes d’emballages ménagers, de verre et d’ordures ménagères) [2].",
+      "answer_seconds": 1.3128926370000045,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q11",
+      "kind": "recherche",
+      "question": "Qui cherche un prestataire de ménage pour un établissement d'enseignement agricole ?",
+      "expected": [
+        "26-99151"
+      ],
+      "retrieved": [
+        "26-99151",
+        "26-98954",
+        "26-98439",
+        "26-99282",
+        "26-99267"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.020855419999861624,
+      "answer": "Le Centre d’enseignement zootechnique Bergerie nationale recherche un prestataire pour les prestations de ménage de ses locaux [1].",
+      "answer_seconds": 0.9358018839998294,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q12",
+      "kind": "recherche",
+      "question": "Le Havre a-t-il publié un marché de balayage mécanique ?",
+      "expected": [
+        "26-98934"
+      ],
+      "retrieved": [
+        "26-98934",
+        "26-98318",
+        "26-98441",
+        "26-99334"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.021557884999992893,
+      "answer": "Oui, Le Havre (via Le Havre Seine Metropole) a publié un avis de marché portant sur le « Balayage mécanique des sites de la direction cycle du déchet »【1】.",
+      "answer_seconds": 0.8294683399999485,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q13",
+      "kind": "liste",
+      "question": "Quels marchés d'entretien ménager de bâtiments sont ouverts ?",
+      "expected": [
+        "26-98391",
+        "26-98519",
+        "26-99151"
+      ],
+      "retrieved": [
+        "26-99108",
+        "26-99251",
+        "26-98519",
+        "26-98400"
+      ],
+      "hit": 1.0,
+      "recall": 0.3333333333333333,
+      "rr": 0.3333333333333333,
+      "search_seconds": 0.022729632999926253,
+      "answer": "**Marchés d’entretien ménager de bâtiments en procédure ouverte**\n\n| Avis | Acheteur | Objet du marché | Procédure | Lots |\n|------|----------|----------------|-----------|------|\n| 26‑98519 | Ville de Maubeuge | Entretien et nettoyage des locaux et vitrerie du centre technique municipal, de la Police municipale et du Centre multi‑accueil (CMA) | Procédure Ouverte | 2 lots (Lot 1 : nettoyage des locaux administratifs et techniques ; Lot 2 : nettoyage des locaux du CMA et de la maison sport‑santé) |\n| 26‑98519 (rectificatif) | Ville de Maubeuge | Même objet que ci‑dessus (avis rectificatif) | Procédure Ouverte | 2 lots identiques |\n\nSources : [3] et [5].",
+      "answer_seconds": 1.688039462000006,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": "ValueError: Le juge n'a pas renvoyé de JSON"
+    },
+    {
+      "id": "q14",
+      "kind": "recherche",
+      "question": "Quelle mairie cherche une entreprise de marquage au sol des routes ?",
+      "expected": [
+        "26-99270"
+      ],
+      "retrieved": [
+        "26-98381",
+        "26-99160",
+        "26-99108",
+        "26-99270",
+        "26-98400"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 0.25,
+      "search_seconds": 0.01822225699993396,
+      "answer": "La mairie de Cernay recherche une entreprise pour des travaux de marquage routier [4].",
+      "answer_seconds": 0.5895446659999379,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q15",
+      "kind": "recherche",
+      "question": "Y a-t-il un accord-cadre de VRD dans le Val-d'Oise ?",
+      "expected": [
+        "26-98490"
+      ],
+      "retrieved": [
+        "26-99147",
+        "26-99075",
+        "26-98490",
+        "26-99153",
+        "26-99190"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 0.3333333333333333,
+      "search_seconds": 0.027691516999993837,
+      "answer": "Oui, il existe un accord‑cadre mono attributaire de travaux de voiries et réseaux divers (VRD) pour la mairie de Magny‑en‑Vexin, commune située dans le département du Val‑d’Oise (95) [3].",
+      "answer_seconds": 1.1471170620000066,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q16",
+      "kind": "recherche",
+      "question": "Un département construit-il une piste cyclable ?",
+      "expected": [
+        "26-99123"
+      ],
+      "retrieved": [
+        "26-98457",
+        "26-98567",
+        "26-98954",
+        "26-98571",
+        "26-98381"
+      ],
+      "hit": 0.0,
+      "recall": 0.0,
+      "rr": 0.0,
+      "search_seconds": 0.020557269000164524,
+      "answer": "Je ne trouve pas cette information dans les avis indexés.",
+      "answer_seconds": 1.4863367169998583,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q17",
+      "kind": "liste",
+      "question": "Quels marchés de travaux sur les réseaux d'eau potable ou d'assainissement sont ouverts ?",
+      "expected": [
+        "26-99314",
+        "26-98961",
+        "26-99007"
+      ],
+      "retrieved": [
+        "26-98844",
+        "26-99314",
+        "26-99007",
+        "26-98961"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 0.5,
+      "search_seconds": 0.024875455000028524,
+      "answer": "**Marchés de travaux ouverts portant sur les réseaux d’eau potable ou d’assainissement :**\n\n| Référence | Acheteur | Objet du marché | Type de travaux | Procédure |\n|-----------|----------|----------------|----------------|-----------|\n| [1] | Région Auvergne‑Rhône‑Alpes | Réfection des réseaux d’eau potable du lycée Jean Paul Sartre (Bron, 69) | Travaux de plomberie : remplacement des collecteurs d’eau froide, chaude et adoucie, réfection de la chambre de comptage | Procédure Ouverte |\n| [2] | Ville de Gap | Travaux de réseaux d’eau, d’assainissement et de réseaux divers | Travaux en zone urbaine (lot 1) | Procédure Ouverte (accord‑cadre à bons de commande) |\n| [3] | Ville de Gap | Même marché que [2] (détails de la procédure) | Voir [2] | Procédure adaptée ouverte (article L.2123‑1 du Code de la commande publique) |\n\n**Conclusion**  \nLes deux appels d’offres suivants sont actuellement ouverts : le marché de réfection des réseaux d’eau potable du lycée Jean Paul Sartre à Bron (procédure ouverte) et le marché de travaux de réseaux d’eau, d’assainissement et divers de la Ville de Gap (procédure adaptée ouverte). Aucun autre avis fourni ne précise une procédure ouverte pour les autres projets.",
+      "answer_seconds": 1.604425314000082,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": "JSONDecodeError: Expecting ',' delimiter: line 1 column 1025 (char 1024)"
+    },
+    {
+      "id": "q18",
+      "kind": "liste",
+      "question": "Quels marchés de travaux de voirie sont ouverts ?",
+      "expected": [
+        "26-98490",
+        "26-98864",
+        "26-99022",
+        "26-99123",
+        "26-99270",
+        "26-99304",
+        "26-99349",
+        "26-99363"
+      ],
+      "retrieved": [
+        "26-98506",
+        "26-99314",
+        "26-99022",
+        "26-99153",
+        "26-99163"
+      ],
+      "hit": 1.0,
+      "recall": 0.125,
+      "rr": 0.3333333333333333,
+      "search_seconds": 0.02438362199995936,
+      "answer": "- **Marché SPL Grand Ouest (974) – Modernisation de la ZA Victorine Taïlou**  \n  - Type : travaux (voirie et réseaux divers, signalisation, éclairage public, mobilier urbain)  \n  - Procédure : Procédure ouverte  \n  - Date de parution : 13 octobre 2026  \n  - Date limite de réponse : 12 novembre 2026  \n  - Lieu d’exécution : Saint‑Paul  \n  - Source : [1]\n\n- **Marché Ville de Saint‑Étienne‑du‑Rouvray – Travaux d’aménagement de la Grand‑Place Claude Collin**  \n  - Type : travaux (voirie et réseaux divers)  \n  - Procédure : Procédure ouverte  \n  - Date de parution : 13 octobre 2026  \n  - Date limite de réponse : 4 novembre 2026  \n  - Lieu d’exécution : Saint‑Étienne‑du‑Rouvray  \n  - Source : [3]",
+      "answer_seconds": 1.8432532449999144,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q19",
+      "kind": "recherche",
+      "question": "Une ville achète-t-elle des équipements de cuisine pour ses cantines ?",
+      "expected": [
+        "26-98424"
+      ],
+      "retrieved": [
+        "26-98424",
+        "26-98430",
+        "26-99251",
+        "26-99094"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.040734611000061705,
+      "answer": "Oui. La Ville de Villeneuve‑Saint‑Georges lance un marché pour la fourniture, l’installation et la maintenance d’équipements de cuisine professionnelle destinés à ses établissements municipaux (dont les cantines) [1][4].",
+      "answer_seconds": 0.7538134119999995,
+      "faithfulness": 0.6666666666666666,
+      "unsupported": [
+        "Les équipements de cuisine sont destinés aux cantines."
+      ],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q20",
+      "kind": "liste",
+      "question": "Quels marchés de restauration d'églises ou de patrimoine religieux sont ouverts ?",
+      "expected": [
+        "26-99042",
+        "26-99167",
+        "26-99066"
+      ],
+      "retrieved": [
+        "26-99167",
+        "26-99042",
+        "26-98435",
+        "26-98299"
+      ],
+      "hit": 1.0,
+      "recall": 0.6666666666666666,
+      "rr": 1.0,
+      "search_seconds": 0.020353556999907596,
+      "answer": "**Marchés ouverts de restauration d’églises ou de patrimoine religieux :**\n\n| Avis | Intitulé du marché | Acheteur | Lieu d’exécution | Date limite de réponse |\n|------|--------------------|----------|------------------|------------------------|\n| 26‑99167 | Restauration du clocher – porche de l’église Sainte‑Elisabeth | COMMUNE ATTICHES | (59) Nord | 12/11/2026 |\n| 26‑99042 | Restauration de l’église de La Noue à Saint‑Dizier | Commune de Saint‑Dizier | Saint‑Dizier (52) | 17/11/2026 |\n\nCes deux avis sont publiés le 13 octobre 2026, en procédure ouverte et concernent des travaux de restauration de bâtiments religieux : un clocher/porche d’église et une église complète.  \n\nSources : [1][2]",
+      "answer_seconds": 1.4464349410000068,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q21",
+      "kind": "liste",
+      "question": "Quels marchés de traiteur ou de repas sont ouverts ?",
+      "expected": [
+        "26-98580"
+      ],
+      "retrieved": [
+        "26-99075",
+        "26-98580",
+        "26-98430"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 0.5,
+      "search_seconds": 0.019455488999938098,
+      "answer": "- **Institut national du service public (Strasbourg)** – Marché de services de traiteurs et de livraison de repas (buffets, repas, cocktails, petits‑déjeuners, plateaux et paniers repas) ; procédure ouverte ; publié le 13 octobre 2026 avec une date limite de réponse au 13 novembre 2026 [1].\n\n- **CPAM de Paris** – Marché de prestations de traiteur (buffets, repas assis, cocktails, petits‑déjeuners et pauses gourmandes) ; procédure ouverte ; publié le 13 octobre 2026 avec une date limite de réponse au 30 novembre 2026 [3].",
+      "answer_seconds": 1.6541753550000067,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q22",
+      "kind": "liste",
+      "question": "Quelles communes ont lancé un marché d'assurances ?",
+      "expected": [
+        "26-98312",
+        "26-98355",
+        "26-98442",
+        "26-98478",
+        "26-98485",
+        "26-98493",
+        "26-98528",
+        "26-98859",
+        "26-98870",
+        "26-98874"
+      ],
+      "retrieved": [
+        "26-98859",
+        "26-98355",
+        "26-98493",
+        "26-98528"
+      ],
+      "hit": 1.0,
+      "recall": 0.4,
+      "rr": 1.0,
+      "search_seconds": 0.017177827000068646,
+      "answer": "Les communes qui ont publié un avis de marché d’assurances sont :\n\n- **Les Mureaux** (Ville des Mureaux) : avis 26‑98355 [3]  \n- **Autrans‑Méaudre en Vercors** (Mairie d’Autrans‑Méaudre en Vercors) : avis 26‑98493 [4]  \n- **Pins‑Justaret** (Commune de Pins Justaret) : avis 26‑98528 [5]",
+      "answer_seconds": 1.3360585729999457,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q23",
+      "kind": "recherche",
+      "question": "Un hôpital de Lozère cherche-t-il un assureur ?",
+      "expected": [
+        "26-98497"
+      ],
+      "retrieved": [
+        "26-98497",
+        "26-98870",
+        "26-98515"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.05076975500014669,
+      "answer": "Oui. L’Hôpital de Lozère lance un marché public d’assurances (lots « dommages aux biens », « responsabilité civile », « protection juridique ») afin de sélectionner des assureurs pour ses établissements [1][2].",
+      "answer_seconds": 1.1313226860002032,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q24",
+      "kind": "recherche",
+      "question": "Y a-t-il une offre de location longue durée de véhicules à La Réunion ?",
+      "expected": [
+        "26-98524"
+      ],
+      "retrieved": [
+        "26-98524",
+        "26-98938"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.021609361999935572,
+      "answer": "Oui, il existe un avis de marché portant sur une offre de location longue durée (LLD) de véhicules (avec entretien et assurance tous risques) pour la Chambre de Métiers et de l'Artisanat de la Réunion : « Location Longue Durée (LLD) avec entretien et assurance tous risques du parc automobile de la Chambre de Métiers et de l'Artisanat de la Réunion » [1][2].",
+      "answer_seconds": 1.0427419309999095,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q25",
+      "kind": "recherche",
+      "question": "Qui veut acheter un système de vote électronique ?",
+      "expected": [
+        "26-98438"
+      ],
+      "retrieved": [
+        "26-98438",
+        "26-98457",
+        "26-99147",
+        "26-99018",
+        "26-98548"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.013557890000129191,
+      "answer": "Le Centre National de la Recherche Scientifique (CNRS), Délégation Occitanie Ouest, souhaite acquérir un système de vote électronique【1】.",
+      "answer_seconds": 0.7637915140001041,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q26",
+      "kind": "recherche",
+      "question": "Y a-t-il un marché pour dématérialiser les fiches de paie ?",
+      "expected": [
+        "26-98489"
+      ],
+      "retrieved": [
+        "26-98489",
+        "26-99147",
+        "26-98935",
+        "26-98450"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.024159661999874515,
+      "answer": "Oui, un marché public a été publié pour la fourniture d’une solution de dématérialisation des bulletins de paie avec distribution vers le coffre‑fort numérique des agents des collectivités adhérentes à l’Alpi [1][3].",
+      "answer_seconds": 1.0566740010001467,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q27",
+      "kind": "recherche",
+      "question": "Un lycée agricole de l'Oise renouvelle-t-il son infrastructure réseau ?",
+      "expected": [
+        "26-99282"
+      ],
+      "retrieved": [
+        "26-99282",
+        "26-98844",
+        "26-98567"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.020953785000074276,
+      "answer": "Oui. Un lycée agricole de l’Oise (le CFA Agricole Public des Hauts‑de‑France) lance un marché pour la fourniture, l’installation, le paramétrage, la supervision et la maintenance d’une infrastructure VPN inter‑sites, ce qui correspond à un renouvellement de son réseau informatique [1][2].",
+      "answer_seconds": 1.1634293410002101,
+      "faithfulness": 0.8,
+      "unsupported": [
+        "Le marché correspond à un renouvellement de son réseau informatique."
+      ],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q28",
+      "kind": "hors_sujet",
+      "question": "Y a-t-il des marchés de nettoyage en Belgique ?",
+      "expected": [],
+      "retrieved": [
+        "26-98454",
+        "26-98400",
+        "26-98519"
+      ],
+      "hit": null,
+      "recall": null,
+      "rr": null,
+      "search_seconds": 0.023311637000006158,
+      "answer": "Je ne trouve pas cette information dans les avis indexés.",
+      "answer_seconds": 0.8861410380000052,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": true,
+      "error": null
+    },
+    {
+      "id": "q29",
+      "kind": "hors_sujet",
+      "question": "Quelle entreprise a remporté le marché d'assurances des Mureaux ?",
+      "expected": [],
+      "retrieved": [
+        "26-98355",
+        "26-98859",
+        "26-99163",
+        "26-99153"
+      ],
+      "hit": null,
+      "recall": null,
+      "rr": null,
+      "search_seconds": 0.02159827800005587,
+      "answer": "Je ne trouve pas cette information dans les avis indexés.",
+      "answer_seconds": 1.0449824740001077,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": true,
+      "error": null
+    },
+    {
+      "id": "q30",
+      "kind": "hors_sujet",
+      "question": "Quel est le montant attribué au marché de signalisation de Nevers ?",
+      "expected": [],
+      "retrieved": [
+        "26-98309",
+        "26-99190",
+        "26-98498",
+        "26-98552",
+        "26-98356"
+      ],
+      "hit": null,
+      "recall": null,
+      "rr": null,
+      "search_seconds": 0.022429550999959247,
+      "answer": "Je ne trouve pas cette information dans les avis indexés.",
+      "answer_seconds": 0.6887731280000935,
+      "faithfulness": 1.0,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": true,
+      "error": null
+    }
+  ]
+}

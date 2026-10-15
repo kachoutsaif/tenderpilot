@@ -21,6 +21,7 @@ class OpenAICompatibleLLM:
         model: str,
         temperature: float = 0.0,
         max_tokens: int = 800,
+        **request_options,
     ):
         from openai import OpenAI
 
@@ -30,6 +31,8 @@ class OpenAICompatibleLLM:
         self.model = model
         self.temperature = temperature
         self.max_tokens = max_tokens
+        # options propres au fournisseur, ex. reasoning_effort='low' pour gpt-oss
+        self.request_options = request_options
 
     def complete(self, messages: list[dict[str, str]]) -> str:
         response = self._client.chat.completions.create(
@@ -37,5 +40,6 @@ class OpenAICompatibleLLM:
             messages=messages,
             temperature=self.temperature,
             max_tokens=self.max_tokens,
+            **self.request_options,
         )
         return (response.choices[0].message.content or "").strip()
