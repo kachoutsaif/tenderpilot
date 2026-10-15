@@ -27,7 +27,7 @@ def main() -> None:
     llm = OpenAICompatibleLLM(api_key=s.llm_api_key, base_url=s.llm_base_url, model=s.llm_model)
 
     start = time.perf_counter()
-    answer = answer_question(question, embedder, store, llm, k=s.top_k)
+    answer = answer_question(question, embedder, store, llm, k=s.top_k, mode=s.retrieval_mode)
     elapsed = time.perf_counter() - start
 
     print(f"\n{answer.text}\n")

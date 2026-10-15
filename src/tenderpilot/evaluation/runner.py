@@ -23,6 +23,7 @@ from tenderpilot.evaluation.metrics import (
     unique_in_order,
 )
 from tenderpilot.rag.pipeline import answer_question
+from tenderpilot.rag.retrieval import retrieve
 
 
 @dataclass
@@ -45,9 +46,11 @@ class QuestionResult:
     error: str | None = None
 
 
-def evaluate_question(q: EvalQuestion, embedder, store, k: int, llm=None, judge=None):
+def evaluate_question(
+    q: EvalQuestion, embedder, store, k: int, llm=None, judge=None, mode: str = "vector"
+):
     start = time.perf_counter()
-    chunks = store.search(embedder.embed([q.question])[0], k=k)
+    chunks = retrieve(q.question, embedder, store, k=k, mode=mode)
     retrieved = unique_in_order(c.notice_id for c in chunks)
     result = QuestionResult(
         id=q.id,
@@ -67,7 +70,7 @@ def evaluate_question(q: EvalQuestion, embedder, store, k: int, llm=None, judge=
         return result
     try:
         start = time.perf_counter()
-        answer = answer_question(q.question, embedder, store, llm, k=k)
+        answer = answer_question(q.question, embedder, store, llm, k=k, mode=mode)
         result.answer_seconds = time.perf_counter() - start
         result.answer = answer.text
         result.invalid_citations = answer.invalid_citations
@@ -110,10 +113,20 @@ def summarize(results: list[QuestionResult]) -> dict:
     return {"global": block(results), "par_type": {k: block(v) for k, v in sorted(by_kind.items())}}
 
 
-def run_evaluation(questions, embedder, store, k=5, llm=None, judge=None, pause=0.0, progress=None):
+def run_evaluation(
+    questions,
+    embedder,
+    store,
+    k=5,
+    llm=None,
+    judge=None,
+    pause=0.0,
+    progress=None,
+    mode="vector",
+):
     results = []
     for number, q in enumerate(questions, start=1):
-        results.append(evaluate_question(q, embedder, store, k, llm=llm, judge=judge))
+        results.append(evaluate_question(q, embedder, store, k, llm=llm, judge=judge, mode=mode))
         if progress:
             progress(number, len(questions), results[-1])
         if pause and llm is not None:

@@ -52,14 +52,24 @@ def main() -> None:
     parser.add_argument("--file", default="eval/questions.jsonl")
     parser.add_argument("--label", default="sans-nom", help="nom de la configuration testée")
     parser.add_argument("--k", type=int, default=None, help="nombre de morceaux récupérés")
+    parser.add_argument(
+        "--mode",
+        default=None,
+        choices=["vector", "text", "hybrid"],
+        help="mode de recherche (par défaut : RETRIEVAL_MODE du .env)",
+    )
     parser.add_argument("--with-llm", action="store_true", help="évalue aussi les réponses")
     parser.add_argument("--pause", type=float, default=1.0, help="secondes entre deux questions")
     args = parser.parse_args()
 
     s = get_settings()
     k = args.k or s.top_k
+    mode = args.mode or s.retrieval_mode
     questions = load_questions(args.file)
-    print(f"{len(questions)} questions chargées, k = {k}, configuration « {args.label} »")
+    print(
+        f"{len(questions)} questions chargées, k = {k}, recherche « {mode} », "
+        f"configuration « {args.label} »"
+    )
 
     embedder = FastEmbedEmbedder(s.embedding_model, cache_dir=s.embedding_cache_dir)
     store = PgVectorStore(s.database_url, dim=embedder.dim)
@@ -78,7 +88,15 @@ def main() -> None:
         print(f"  [{i:>2}/{total}] {r.id:<6} {status:<6} {r.question[:70]}")
 
     results, summary = run_evaluation(
-        questions, embedder, store, k=k, llm=llm, judge=judge, pause=args.pause, progress=progress
+        questions,
+        embedder,
+        store,
+        k=k,
+        llm=llm,
+        judge=judge,
+        pause=args.pause,
+        progress=progress,
+        mode=mode,
     )
     print_table(summary)
 
@@ -102,6 +120,7 @@ def main() -> None:
         "date": datetime.now().isoformat(timespec="seconds"),
         "config": {
             "k": k,
+            "retrieval_mode": mode,
             "embedding_model": s.embedding_model,
             "llm_model": s.llm_model,
             "chunk_size": s.chunk_size,

@@ -93,7 +93,9 @@ def ask(
     body: AskRequest, embedder=Depends(get_embedder), store=Depends(get_store), llm=Depends(get_llm)
 ):
     try:
-        result = answer_question(body.question, embedder, store, llm, k=body.k)
+        result = answer_question(
+            body.question, embedder, store, llm, k=body.k, mode=get_settings().retrieval_mode
+        )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     return AskResponse(

@@ -26,6 +26,8 @@ class Settings(BaseSettings):
     chunk_size: int = 1200
     chunk_overlap: int = 200
     top_k: int = 5
+    # recherche : "vector" (embeddings), "text" (plein texte) ou "hybrid" (les deux, fusion RRF)
+    retrieval_mode: str = "vector"
 
 
 @lru_cache

@@ -1,0 +1,831 @@
+{
+  "label": "texte",
+  "date": "2026-10-16T00:17:48",
+  "config": {
+    "k": 5,
+    "retrieval_mode": "text",
+    "embedding_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    "llm_model": "openai/gpt-oss-120b",
+    "chunk_size": 1200,
+    "chunk_overlap": 200
+  },
+  "summary": {
+    "global": {
+      "questions": 30,
+      "hit@k": 0.923,
+      "recall@k": 0.82,
+      "mrr": 0.792,
+      "fidelite": null,
+      "hors_sujet_ok": null,
+      "citations_invalides": 0,
+      "erreurs": 0,
+      "latence_moy_s": null,
+      "latence_p95_s": null
+    },
+    "par_type": {
+      "filtre": {
+        "questions": 1,
+        "hit@k": 1.0,
+        "recall@k": 1.0,
+        "mrr": 0.333,
+        "fidelite": null,
+        "hors_sujet_ok": null,
+        "citations_invalides": 0,
+        "erreurs": 0,
+        "latence_moy_s": null,
+        "latence_p95_s": null
+      },
+      "hors_sujet": {
+        "questions": 4,
+        "hit@k": null,
+        "recall@k": null,
+        "mrr": null,
+        "fidelite": null,
+        "hors_sujet_ok": null,
+        "citations_invalides": 0,
+        "erreurs": 0,
+        "latence_moy_s": null,
+        "latence_p95_s": null
+      },
+      "liste": {
+        "questions": 8,
+        "hit@k": 1.0,
+        "recall@k": 0.666,
+        "mrr": 0.656,
+        "fidelite": null,
+        "hors_sujet_ok": null,
+        "citations_invalides": 0,
+        "erreurs": 0,
+        "latence_moy_s": null,
+        "latence_p95_s": null
+      },
+      "recherche": {
+        "questions": 17,
+        "hit@k": 0.882,
+        "recall@k": 0.882,
+        "mrr": 0.882,
+        "fidelite": null,
+        "hors_sujet_ok": null,
+        "citations_invalides": 0,
+        "erreurs": 0,
+        "latence_moy_s": null,
+        "latence_p95_s": null
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "q01",
+      "kind": "recherche",
+      "question": "Quels marchés de signalisation routière sont ouverts ?",
+      "expected": [
+        "26-98309"
+      ],
+      "retrieved": [
+        "26-98309",
+        "26-98567",
+        "26-99153",
+        "26-99270"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.015653447999966374,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q02",
+      "kind": "recherche",
+      "question": "La ville de Nevers a-t-elle publié un marché de panneaux de signalisation ?",
+      "expected": [
+        "26-98309"
+      ],
+      "retrieved": [
+        "26-98309",
+        "26-98641"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.006176819999950567,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q03",
+      "kind": "recherche",
+      "question": "Y a-t-il un marché de nettoyage des locaux et de la vitrerie à Maubeuge ?",
+      "expected": [
+        "26-98519"
+      ],
+      "retrieved": [
+        "26-98519",
+        "26-98934"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.005519651999975395,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q04",
+      "kind": "recherche",
+      "question": "Quels marchés concernent la propreté des espaces publics ?",
+      "expected": [
+        "26-98400"
+      ],
+      "retrieved": [
+        "26-98400",
+        "26-98851"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.004452187999959278,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q05",
+      "kind": "liste",
+      "question": "Quels marchés de nettoyage sont ouverts ?",
+      "expected": [
+        "26-98519",
+        "26-98400"
+      ],
+      "retrieved": [
+        "26-99153",
+        "26-98400",
+        "26-98519",
+        "26-98391",
+        "26-98934"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 0.5,
+      "search_seconds": 0.003970321999986481,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q06",
+      "kind": "liste",
+      "question": "Quels marchés de fourniture de matériel informatique sont ouverts ?",
+      "expected": [
+        "26-98537",
+        "26-98342"
+      ],
+      "retrieved": [
+        "26-98537",
+        "26-98342",
+        "26-99282"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.005538200999922083,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q07",
+      "kind": "filtre",
+      "question": "Quels marchés informatiques ont une durée de plus de 24 mois ?",
+      "expected": [
+        "26-98537",
+        "26-98342"
+      ],
+      "retrieved": [
+        "26-98489",
+        "26-98538",
+        "26-98537",
+        "26-98422",
+        "26-98342"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 0.3333333333333333,
+      "search_seconds": 0.004913537999982509,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q08",
+      "kind": "hors_sujet",
+      "question": "Quel est le prix du marché de construction du stade olympique de Marseille ?",
+      "expected": [],
+      "retrieved": [
+        "26-99153",
+        "26-98880",
+        "26-99353",
+        "26-98941"
+      ],
+      "hit": null,
+      "recall": null,
+      "rr": null,
+      "search_seconds": 0.004501933000028657,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q09",
+      "kind": "recherche",
+      "question": "Une commune cherche-t-elle une entreprise pour nettoyer ses vitres et ses brise-soleil ?",
+      "expected": [
+        "26-98391"
+      ],
+      "retrieved": [
+        "26-98391",
+        "26-98851",
+        "26-98457"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.0019488500000761633,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q10",
+      "kind": "recherche",
+      "question": "Y a-t-il un marché de lavage des conteneurs de tri des déchets ?",
+      "expected": [
+        "26-98454"
+      ],
+      "retrieved": [
+        "26-98454",
+        "26-98961",
+        "26-98495",
+        "26-99274"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.005659272000002602,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q11",
+      "kind": "recherche",
+      "question": "Qui cherche un prestataire de ménage pour un établissement d'enseignement agricole ?",
+      "expected": [
+        "26-99151"
+      ],
+      "retrieved": [
+        "26-99151",
+        "26-98517",
+        "26-99122",
+        "26-98495"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.002614409000102569,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q12",
+      "kind": "recherche",
+      "question": "Le Havre a-t-il publié un marché de balayage mécanique ?",
+      "expected": [
+        "26-98934"
+      ],
+      "retrieved": [
+        "26-98934",
+        "26-98318"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.005554071999995358,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q13",
+      "kind": "liste",
+      "question": "Quels marchés d'entretien ménager de bâtiments sont ouverts ?",
+      "expected": [
+        "26-98391",
+        "26-98519",
+        "26-99151"
+      ],
+      "retrieved": [
+        "26-99151",
+        "26-99153",
+        "26-98519",
+        "26-98515"
+      ],
+      "hit": 1.0,
+      "recall": 0.6666666666666666,
+      "rr": 1.0,
+      "search_seconds": 0.004734936999966521,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q14",
+      "kind": "recherche",
+      "question": "Quelle mairie cherche une entreprise de marquage au sol des routes ?",
+      "expected": [
+        "26-99270"
+      ],
+      "retrieved": [
+        "26-99270",
+        "26-99153",
+        "26-99269",
+        "26-99360",
+        "26-98838"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.0020212379999975383,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q15",
+      "kind": "recherche",
+      "question": "Y a-t-il un accord-cadre de VRD dans le Val-d'Oise ?",
+      "expected": [
+        "26-98490"
+      ],
+      "retrieved": [
+        "26-99190",
+        "26-99282",
+        "26-98347",
+        "26-99100",
+        "26-98534"
+      ],
+      "hit": 0.0,
+      "recall": 0.0,
+      "rr": 0.0,
+      "search_seconds": 0.004547669999965365,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q16",
+      "kind": "recherche",
+      "question": "Un département construit-il une piste cyclable ?",
+      "expected": [
+        "26-99123"
+      ],
+      "retrieved": [
+        "26-98954",
+        "26-98381",
+        "26-98393",
+        "26-98457"
+      ],
+      "hit": 0.0,
+      "recall": 0.0,
+      "rr": 0.0,
+      "search_seconds": 0.0022836189999679846,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q17",
+      "kind": "liste",
+      "question": "Quels marchés de travaux sur les réseaux d'eau potable ou d'assainissement sont ouverts ?",
+      "expected": [
+        "26-99314",
+        "26-98961",
+        "26-99007"
+      ],
+      "retrieved": [
+        "26-98844",
+        "26-99007",
+        "26-99314"
+      ],
+      "hit": 1.0,
+      "recall": 0.6666666666666666,
+      "rr": 0.5,
+      "search_seconds": 0.007741655999893737,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q18",
+      "kind": "liste",
+      "question": "Quels marchés de travaux de voirie sont ouverts ?",
+      "expected": [
+        "26-98490",
+        "26-98864",
+        "26-99022",
+        "26-99123",
+        "26-99270",
+        "26-99304",
+        "26-99349",
+        "26-99363"
+      ],
+      "retrieved": [
+        "26-99153",
+        "26-99363",
+        "26-98506",
+        "26-99291",
+        "26-99160"
+      ],
+      "hit": 1.0,
+      "recall": 0.125,
+      "rr": 0.5,
+      "search_seconds": 0.00741365599992605,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q19",
+      "kind": "recherche",
+      "question": "Une ville achète-t-elle des équipements de cuisine pour ses cantines ?",
+      "expected": [
+        "26-98424"
+      ],
+      "retrieved": [
+        "26-98424",
+        "26-98856",
+        "26-98914"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.0022451449999607576,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q20",
+      "kind": "liste",
+      "question": "Quels marchés de restauration d'églises ou de patrimoine religieux sont ouverts ?",
+      "expected": [
+        "26-99042",
+        "26-99167",
+        "26-99066"
+      ],
+      "retrieved": [
+        "26-99042",
+        "26-99167",
+        "26-98665"
+      ],
+      "hit": 1.0,
+      "recall": 0.6666666666666666,
+      "rr": 1.0,
+      "search_seconds": 0.003908386000034625,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q21",
+      "kind": "liste",
+      "question": "Quels marchés de traiteur ou de repas sont ouverts ?",
+      "expected": [
+        "26-98580"
+      ],
+      "retrieved": [
+        "26-99075",
+        "26-98580",
+        "26-99079"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 0.5,
+      "search_seconds": 0.00424732600004063,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q22",
+      "kind": "liste",
+      "question": "Quelles communes ont lancé un marché d'assurances ?",
+      "expected": [
+        "26-98312",
+        "26-98355",
+        "26-98442",
+        "26-98478",
+        "26-98485",
+        "26-98493",
+        "26-98528",
+        "26-98859",
+        "26-98870",
+        "26-98874"
+      ],
+      "retrieved": [
+        "26-99090",
+        "26-99153",
+        "26-98701",
+        "26-98493",
+        "26-98355"
+      ],
+      "hit": 1.0,
+      "recall": 0.2,
+      "rr": 0.25,
+      "search_seconds": 0.004132257999913236,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q23",
+      "kind": "recherche",
+      "question": "Un hôpital de Lozère cherche-t-il un assureur ?",
+      "expected": [
+        "26-98497"
+      ],
+      "retrieved": [
+        "26-98497",
+        "26-98870",
+        "26-99198"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.0012767130000383986,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q24",
+      "kind": "recherche",
+      "question": "Y a-t-il une offre de location longue durée de véhicules à La Réunion ?",
+      "expected": [
+        "26-98524"
+      ],
+      "retrieved": [
+        "26-98524",
+        "26-98938"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.005049401999940528,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q25",
+      "kind": "recherche",
+      "question": "Qui veut acheter un système de vote électronique ?",
+      "expected": [
+        "26-98438"
+      ],
+      "retrieved": [
+        "26-98438",
+        "26-98347",
+        "26-98457",
+        "26-98533"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.0017427619999352828,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q26",
+      "kind": "recherche",
+      "question": "Y a-t-il un marché pour dématérialiser les fiches de paie ?",
+      "expected": [
+        "26-98489"
+      ],
+      "retrieved": [
+        "26-98489",
+        "26-99160",
+        "26-98961",
+        "26-99060"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.007982465999930355,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q27",
+      "kind": "recherche",
+      "question": "Un lycée agricole de l'Oise renouvelle-t-il son infrastructure réseau ?",
+      "expected": [
+        "26-99282"
+      ],
+      "retrieved": [
+        "26-99282",
+        "26-99153",
+        "26-98376"
+      ],
+      "hit": 1.0,
+      "recall": 1.0,
+      "rr": 1.0,
+      "search_seconds": 0.0015094110000291039,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q28",
+      "kind": "hors_sujet",
+      "question": "Y a-t-il des marchés de nettoyage en Belgique ?",
+      "expected": [],
+      "retrieved": [
+        "26-98519",
+        "26-99344",
+        "26-98934",
+        "26-99160"
+      ],
+      "hit": null,
+      "recall": null,
+      "rr": null,
+      "search_seconds": 0.005686126999989938,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q29",
+      "kind": "hors_sujet",
+      "question": "Quelle entreprise a remporté le marché d'assurances des Mureaux ?",
+      "expected": [],
+      "retrieved": [
+        "26-99153",
+        "26-98355",
+        "26-98939"
+      ],
+      "hit": null,
+      "recall": null,
+      "rr": null,
+      "search_seconds": 0.006234755000036785,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    },
+    {
+      "id": "q30",
+      "kind": "hors_sujet",
+      "question": "Quel est le montant attribué au marché de signalisation de Nevers ?",
+      "expected": [],
+      "retrieved": [
+        "26-98309",
+        "26-98506",
+        "26-99153"
+      ],
+      "hit": null,
+      "recall": null,
+      "rr": null,
+      "search_seconds": 0.004236271000081615,
+      "answer": null,
+      "answer_seconds": null,
+      "faithfulness": null,
+      "unsupported": [],
+      "invalid_citations": [],
+      "not_found_ok": null,
+      "error": null
+    }
+  ]
+}

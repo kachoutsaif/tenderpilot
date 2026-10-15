@@ -96,9 +96,45 @@ reranker), dans l'ordre que les chiffres justifient.
 
 ---
 
+## Jour 6 : recherche hybride (plein texte + vecteurs)
+
+**Pourquoi :** le diagnostic (`scripts/diagnose_misses.py`) a montré que 15 avis attendus sur 18
+étaient au-delà du rang 20 en recherche vectorielle. Le modèle d'embedding comprend le thème
+général mais rate les mots rares (« traiteur » au rang 17, alors que le titre contient le mot).
+
+**Ce qui a été ajouté :**
+
+| Élément | Rôle |
+|---|---|
+| colonne `tsv` (calculée par PostgreSQL) + index GIN | texte racinisé en français, sans accents ni majuscules |
+| `store.search_fulltext` | score = somme des IDF des mots de la question présents (mots reliés par OU) |
+| `rag/retrieval.py` | trois modes : `vector`, `text`, `hybrid` (fusion RRF des deux classements) |
+| `RETRIEVAL_MODE` dans `.env` | choisit le mode utilisé par l'API et `ask.py` |
+
+**Mesurer les trois modes sur la même base :**
+
+```bash
+python scripts/init_db.py                                # ajoute la colonne tsv (sans perte)
+python scripts/evaluate.py --label casse_vector --mode vector
+python scripts/evaluate.py --label texte --mode text
+python scripts/evaluate.py --label hybride --mode hybrid
+```
+
+Si l'hybride gagne, mettez `RETRIEVAL_MODE=hybrid` dans `.env`.
+
+**RRF en une phrase :** chaque morceau reçoit 1 / (60 + rang) dans chaque classement où il
+apparaît, et on additionne. On fusionne des rangs, donc pas besoin de rendre comparables une
+similarité cosinus et un score plein texte.
+
+---
+
 ## Questions d'entretien sur cette semaine
 
 - Quelle différence entre hit@k, recall@k et MRR ? Laquelle compte le plus pour votre cas ?
 - Comment évaluer un RAG sans annotation humaine ? Quelles sont les limites du LLM-as-judge ?
 - Pourquoi une citation valide n'implique-t-elle pas une réponse fidèle ? (votre exemple CAIH)
 - Comment éviter que le jeu d'évaluation soit biaisé en faveur de votre système ?
+- Pourquoi RRF plutôt qu'une moyenne pondérée des scores ? Que représente la constante 60 ?
+- Pourquoi un mot comme « marché » ne doit-il presque pas compter dans le score plein texte ?
+- Votre recherche plein texte n'a pas de normalisation par longueur (contrairement à BM25) :
+  quel biais cela introduit-il ?

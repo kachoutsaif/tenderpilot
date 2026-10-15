@@ -76,3 +76,16 @@ def test_search_text(pg_store, sample_records):
     rows = store.search_text(["maintenance", "serveurs"])
     assert [r["id"] for r in rows] == ["TEST-0002"]
     assert store.search_text(["introuvable-xyz"]) == []
+
+
+def test_search_fulltext_sans_accents_ni_majuscules(pg_store, sample_records):
+    store, embedder = pg_store
+    for record in sample_records:
+        notice = record_to_notice(record)
+        if notice:
+            ingest_notice(notice, embedder, store)
+    # « SERVEURS » en majuscules et sans accent doit retrouver l'avis de maintenance
+    results = store.search_fulltext("Qui gère la MAINTENANCE des SERVEURS ?", k=3)
+    assert results and results[0].notice_id == "TEST-0002"
+    assert results[0].score > 0
+    assert store.search_fulltext("zzzz introuvable", k=3) == []

@@ -68,6 +68,27 @@ class InMemoryStore:
             for s, c in scored
         ]
 
+    def search_fulltext(self, query, k=5):
+        """Version simplifiée : nombre de mots de la question (4 lettres ou plus) présents."""
+        words = set(re.findall(r"\w{4,}", query.lower()))
+        scored = []
+        for c, _ in self.rows:
+            score = sum(1 for w in words if w in c.content.lower())
+            if score:
+                scored.append((score, c))
+        scored.sort(key=lambda x: x[0], reverse=True)
+        return [
+            RetrievedChunk(
+                notice_id=c.notice_id,
+                chunk_index=c.index,
+                content=c.content,
+                score=float(s),
+                title=self.notices[c.notice_id].title,
+                url=self.notices[c.notice_id].url,
+            )
+            for s, c in scored[:k]
+        ]
+
     def list_notices(self, limit=20):
         return [{"id": n.id, "title": n.title} for n in list(self.notices.values())[:limit]]
 

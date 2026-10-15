@@ -34,6 +34,54 @@ CREATE TABLE IF NOT EXISTS chunks (
 
 CREATE INDEX IF NOT EXISTS chunks_embedding_hnsw
     ON chunks USING hnsw (embedding vector_cosine_ops);
+
+-- Recherche plein texte en français, sans tenir compte des accents ni des majuscules :
+-- « Bâtiments » et « batiment » donnent la même racine « batiment ».
+CREATE EXTENSION IF NOT EXISTS unaccent;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_ts_config WHERE cfgname = 'fr_unaccent') THEN
+        CREATE TEXT SEARCH CONFIGURATION fr_unaccent (COPY = french);
+        ALTER TEXT SEARCH CONFIGURATION fr_unaccent
+            ALTER MAPPING FOR hword, hword_part, word WITH unaccent, french_stem;
+    END IF;
+END $$;
+
+-- colonne calculée par PostgreSQL : toujours à jour, y compris pour les morceaux existants
+ALTER TABLE chunks ADD COLUMN IF NOT EXISTS tsv tsvector
+    GENERATED ALWAYS AS (to_tsvector('fr_unaccent'::regconfig, content)) STORED;
+CREATE INDEX IF NOT EXISTS chunks_tsv_gin ON chunks USING gin (tsv);
+"""
+
+# Score plein texte d'un morceau = somme des IDF des mots de la question qu'il contient.
+# IDF (formule de BM25) : un mot présent partout (« marché ») ne compte presque pas,
+# un mot rare (« traiteur ») compte beaucoup. Les mots sont reliés par OU : un morceau
+# n'a pas besoin de contenir tous les mots de la question.
+FULLTEXT_SQL = """
+WITH terms AS (
+    SELECT DISTINCT lex
+    FROM unnest(tsvector_to_array(to_tsvector('fr_unaccent', %(q)s))) AS lex
+),
+total AS (SELECT count(*)::float8 AS n FROM chunks),
+weighted AS (
+    SELECT quote_literal(t.lex)::tsquery AS tq,
+           ln(1 + (total.n - s.df + 0.5) / (s.df + 0.5)) AS idf
+    FROM terms t
+    CROSS JOIN total
+    CROSS JOIN LATERAL (
+        SELECT count(*)::float8 AS df
+        FROM chunks c
+        WHERE c.tsv @@ quote_literal(t.lex)::tsquery
+    ) s
+    WHERE s.df > 0
+)
+SELECT c.notice_id, c.chunk_index, c.content, sum(w.idf) AS score, n.title, n.url
+FROM weighted w
+JOIN chunks c ON c.tsv @@ w.tq
+JOIN notices n ON n.id = c.notice_id
+GROUP BY c.id, n.id
+ORDER BY score DESC, c.id
+LIMIT %(k)s
 """
 
 
@@ -116,17 +164,12 @@ class PgVectorStore:
             """,
             {"q": np.asarray(query_vector, dtype=np.float32), "k": k},
         ).fetchall()
-        return [
-            RetrievedChunk(
-                notice_id=r[0],
-                chunk_index=r[1],
-                content=r[2],
-                score=float(r[3]),
-                title=r[4],
-                url=r[5],
-            )
-            for r in rows
-        ]
+        return [_to_chunk(r) for r in rows]
+
+    def search_fulltext(self, query: str, k: int = 5) -> list[RetrievedChunk]:
+        """Les k morceaux qui contiennent le plus de mots rares de la question."""
+        rows = self.conn.execute(FULLTEXT_SQL, {"q": query, "k": k}).fetchall()
+        return [_to_chunk(r) for r in rows]
 
     def search_text(self, words: list[str], limit: int = 30) -> list[dict]:
         """Avis contenant tous les mots donnés (aide à la préparation de l'évaluation)."""
@@ -161,3 +204,15 @@ class PgVectorStore:
 
     def close(self) -> None:
         self.conn.close()
+
+
+def _to_chunk(row) -> RetrievedChunk:
+    notice_id, chunk_index, content, score, title, url = row
+    return RetrievedChunk(
+        notice_id=notice_id,
+        chunk_index=chunk_index,
+        content=content,
+        score=float(score),
+        title=title,
+        url=url,
+    )
