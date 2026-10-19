@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 
 from tenderpilot.agent.extraction import Requirements
+from tenderpilot.agent.memory import format_lessons
 from tenderpilot.agent.profile import CompanyProfile
 from tenderpilot.models import RetrievedChunk
 
@@ -13,15 +14,20 @@ TO_COMPLETE = "[À COMPLÉTER]"
 DRAFT_PROMPT = f"""Tu aides une PME à préparer sa réponse à un appel d'offres public.
 Rédige en français un BROUILLON de note de candidature, en Markdown, avec ces sections :
 
-## 1. Compréhension du besoin
-## 2. Réponse aux exigences (une ligne par exigence : exigence -> notre réponse)
+## 1. Compréhension du besoin (objet et CONTEXTE)
+## 2. Réponse aux exigences (une ligne par EXIGENCE À TRAITER : exigence -> notre réponse)
 ## 3. Références similaires
 ## 4. Points à vérifier avant de répondre
 ## 5. Pièces à préparer (liste usuelle, à confirmer avec le DCE)
 
 Règles strictes (ce brouillon sera vérifié automatiquement) :
-- Section 1 : reformule UNIQUEMENT les exigences fournies. N'ajoute aucune attente,
+- Section 1 : reformule UNIQUEMENT l'objet et le CONTEXTE fournis. N'ajoute aucune attente,
   fréquence, reconduction, prestation ou obligation qui n'y figure pas.
+- Le CONTEXTE (lieu, durée, montant) ne se traite qu'en section 1 : n'écris AUCUNE phrase
+  de capacité, d'engagement ou de disponibilité à son sujet (« nous assurerons sur 48 mois »,
+  « nos équipes interviendront sur le site »...).
+- Section 2 : uniquement les EXIGENCES À TRAITER. S'il n'y en a aucune, écris « Aucune
+  exigence de capacité dans l'avis : à vérifier dans le DCE. »
 - Sections 2 et 3 : chaque affirmation sur l'entreprise doit venir du PROFIL fourni.
   Pour tout ce que le profil ne dit pas (méthodes, moyens, produits, organisation,
   engagements), écris {TO_COMPLETE} suivi de ce qu'il faut décrire.
@@ -50,12 +56,19 @@ def _profile_block(profile: CompanyProfile) -> str:
     return "\n".join(lines)
 
 
+# Informations de cadrage : à reformuler, pas à « répondre ». Les présenter comme des
+# exigences poussait le rédacteur à inventer une réponse (« nous nous engageons sur 48 mois »).
+CONTEXT_FIELDS = ("lieu_execution", "duree", "montant_estime")
+
+
 def _requirements_block(requirements: Requirements) -> str:
-    lines = [f"Objet : {requirements.resume}"]
-    for name, item in requirements.items():
-        if item.verified:
-            lines.append(f"- {name} : {item.value}")
-    return "\n".join(lines)
+    verified = [(name, item) for name, item in requirements.items() if item.verified]
+    context = [f"- {n} : {i.value}" for n, i in verified if n in CONTEXT_FIELDS]
+    to_answer = [f"- {n} : {i.value}" for n, i in verified if n not in CONTEXT_FIELDS]
+    return "\n".join(
+        [f"Objet : {requirements.resume}", "CONTEXTE :", *(context or ["(aucun)"])]
+        + ["EXIGENCES À TRAITER :", *(to_answer or ["(aucune)"])]
+    )
 
 
 def build_draft_messages(
@@ -65,6 +78,7 @@ def build_draft_messages(
     checks: list[dict],
     decision: str,
     comment: str = "",
+    lessons: list[str] | None = None,
 ) -> list[dict[str, str]]:
     checks_block = "\n".join(f"- {c['name']} : {c['status']} ({c['detail']})" for c in checks)
     user = (
@@ -74,7 +88,8 @@ def build_draft_messages(
     )
     if comment:
         user += f"\nCOMMENTAIRE DU VALIDEUR : {comment}"
-    return [{"role": "system", "content": DRAFT_PROMPT}, {"role": "user", "content": user}]
+    system = DRAFT_PROMPT + format_lessons(lessons or [])
+    return [{"role": "system", "content": system}, {"role": "user", "content": user}]
 
 
 # --- Vérification automatique du brouillon (réutilise le juge de la semaine 2) ---

@@ -1,15 +1,16 @@
 """Le graphe de l'agent (LangGraph).
 
-    charger ──► extraire ──► qualifier ──► validation humaine ──► rédiger ──► vérifier ──► fin
-                                                                               ▲          │
-                                                                réviser ◄──────┘ (si affirmations
-                                                                (1 fois max)       non soutenues)
-       │                                          │
-       └── avis introuvable ──► fin               └── NO-GO confirmé ──► fin
+    charger ─► extraire ─► qualifier ─► validation humaine ─► rédiger ─► vérifier ─► apprendre
+       │                                    │                              │  ▲          │
+       └─ avis introuvable ─► fin           └─ NO-GO ─► fin           réviser          fin
+                                                                (1 fois max, si non soutenu)
 
-La validation humaine utilise `interrupt()` : le graphe s'arrête, son état est
-sauvegardé par le checkpointer, et il reprend quand l'humain répond
-(`graph.invoke(Command(resume=...), config)`). Rien n'est rédigé sans accord humain.
+- La validation humaine utilise `interrupt()` : le graphe s'arrête, son état est
+  sauvegardé par le checkpointer, et il reprend quand l'humain répond
+  (`graph.invoke(Command(resume=...), config)`). Rien n'est rédigé sans accord humain.
+- Rédiger / vérifier / réviser : pattern Évaluateur-Optimiseur (auto-correction bornée).
+- Apprendre : pattern Reflexion. Les erreurs relevées par le juge et la leçon éventuelle
+  de l'humain deviennent des leçons générales, réinjectées dans les prochains brouillons.
 """
 
 from __future__ import annotations
@@ -25,6 +26,7 @@ from tenderpilot.agent.extraction import (
     grounding_rate,
     normalize,
 )
+from tenderpilot.agent.memory import HUMAN, LessonStore, learn_from_errors
 from tenderpilot.agent.profile import CompanyProfile
 from tenderpilot.agent.rules import (
     DECISIONS,
@@ -55,6 +57,8 @@ class AgentState(TypedDict, total=False):
     # toutes les vérifications successives : operator.add AJOUTE au lieu de remplacer
     draft_history: Annotated[list[dict[str, Any]], operator.add]
     revisions: int
+    lessons_used: list[str]  # leçons injectées dans le prompt du rédacteur
+    lessons_learned: list[str]  # leçons apprises ou renforcées à la fin de cette exécution
     error: str
 
 
@@ -82,21 +86,26 @@ _ALIASES = {
 
 
 def parse_review(answer: Any, proposed: str) -> dict[str, str]:
-    """Réponse humaine -> {"decision", "comment"}. Accepte un dict ou un simple texte.
+    """Réponse humaine -> {"decision", "comment"[, "lesson"]}. Accepte un dict ou un texte.
 
     Une réponse vide ou « ok » valide la décision proposée par les règles.
     """
     if isinstance(answer, dict):
         decision = str(answer.get("decision") or proposed)
         comment = str(answer.get("comment") or "")
+        lesson = str(answer.get("lesson") or "").strip()
     else:
         text = str(answer or "").strip()
         decision = proposed if text.lower() in ("", "ok", "oui", "o", "y") else text
         comment = ""
+        lesson = ""
     key = normalize(decision).upper().replace("-", "_").replace(" ", "_")
     if key not in _ALIASES:
         raise ValueError(f"Décision inconnue : {decision!r} (choix : {', '.join(DECISIONS)})")
-    return {"decision": _ALIASES[key], "comment": comment}
+    review = {"decision": _ALIASES[key], "comment": comment}
+    if lesson:
+        review["lesson"] = lesson  # consigne durable, pas seulement pour ce brouillon
+    return review
 
 
 def build_agent(
@@ -106,8 +115,17 @@ def build_agent(
     today=None,
     checkpointer=None,
     max_revisions: int = 1,
+    lessons: LessonStore | None = None,
+    learn: bool = True,
+    max_lessons: int = 10,
+    extract_fn=extract_requirements,
 ):
-    """Construit et compile le graphe. `today` est remplaçable pour les tests."""
+    """Construit et compile le graphe. `today` est remplaçable pour les tests.
+
+    `lessons` : mémoire de leçons (None = pas de mémoire). `learn=False` : les leçons sont
+    utilisées mais aucune n'est ajoutée (utile pour mesurer sur un jeu de test).
+    `extract_fn` : remplaçable, par exemple par une version avec cache pour les mesures.
+    """
     from langgraph.checkpoint.memory import InMemorySaver
     from langgraph.graph import END, START, StateGraph
     from langgraph.types import interrupt
@@ -120,7 +138,7 @@ def build_agent(
 
     def extraire(state: AgentState) -> dict:
         notice = state["notice"]
-        requirements = extract_requirements(llm, notice["title"], notice["text"])
+        requirements = extract_fn(llm, notice["title"], notice["text"])
         return {
             "requirements": requirements.model_dump(),
             "grounding": grounding_rate(requirements),
@@ -145,6 +163,7 @@ def build_agent(
         return {"review": parse_review(answer, state["decision"])}
 
     def rediger(state: AgentState) -> dict:
+        used = [lesson.text for lesson in lessons.top(max_lessons)] if lessons else []
         messages = build_draft_messages(
             state["notice"]["title"],
             Requirements.model_validate(state["requirements"]),
@@ -152,8 +171,9 @@ def build_agent(
             state["checks"],
             state["review"]["decision"],
             state["review"].get("comment", ""),
+            used,
         )
-        return {"draft": llm.complete(messages), "revisions": 0}
+        return {"draft": llm.complete(messages), "revisions": 0, "lessons_used": used}
 
     def verifier_brouillon(state: AgentState) -> dict:
         requirements = Requirements.model_validate(state["requirements"])
@@ -168,7 +188,19 @@ def build_agent(
         """Boucle d'auto-correction, bornée : on ne révise pas indéfiniment."""
         if state["draft_check"]["unsupported"] and state.get("revisions", 0) < max_revisions:
             return "reviser"
-        return END
+        return "apprendre"
+
+    def apprendre(state: AgentState) -> dict:
+        if lessons is None or not learn:
+            return {"lessons_learned": []}
+        learned: list[str] = []
+        human = state["review"].get("lesson")
+        if human:
+            learned.append(lessons.add(human, HUMAN).text)
+        # toutes les erreurs vues, y compris celles du 1er brouillon corrigées par la révision
+        claims = list(dict.fromkeys(c for h in state["draft_history"] for c in h["unsupported"]))
+        learned += learn_from_errors(llm, lessons, claims)
+        return {"lessons_learned": learned}
 
     graph = StateGraph(AgentState)
     graph.add_node("charger", charger)
@@ -178,6 +210,7 @@ def build_agent(
     graph.add_node("rediger", rediger)
     graph.add_node("verifier_brouillon", verifier_brouillon)
     graph.add_node("reviser", reviser)
+    graph.add_node("apprendre", apprendre)
 
     graph.add_edge(START, "charger")
     graph.add_conditional_edges(
@@ -191,6 +224,7 @@ def build_agent(
         ["rediger", END],
     )
     graph.add_edge("rediger", "verifier_brouillon")
-    graph.add_conditional_edges("verifier_brouillon", after_check, ["reviser", END])
+    graph.add_conditional_edges("verifier_brouillon", after_check, ["reviser", "apprendre"])
+    graph.add_edge("apprendre", END)
     graph.add_edge("reviser", "verifier_brouillon")
     return graph.compile(checkpointer=checkpointer or InMemorySaver())

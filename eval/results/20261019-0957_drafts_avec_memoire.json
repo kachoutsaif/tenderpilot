@@ -1,0 +1,48 @@
+{
+  "label": "avec_memoire",
+  "memory": "use",
+  "summary": {
+    "avis": 3,
+    "fidelite_1er_jet": 0.919,
+    "non_soutenues_1er_jet": 1,
+    "fidelite_finale": 0.958,
+    "part_revisee": 0.667
+  },
+  "rows": [
+    {
+      "notice_id": "26-98391",
+      "run": 1,
+      "first_faithfulness": 0.8571428571428571,
+      "first_unsupported": [
+        "Clair & Net Services réalise le nettoyage complet des vitrages, encadrements et brises‑soleil selon les exigences du cahier des charges.",
+        "Nous disposons de 42 salariés qualifiés, dont des équipes spécialisées vitrerie, et de matériels adaptés (perches télescopiques, systèmes de récupération d’eau)."
+      ],
+      "final_faithfulness": 1.0,
+      "revisions": 1,
+      "lessons_used": 2,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-98519",
+      "run": 1,
+      "first_faithfulness": 0.9,
+      "first_unsupported": [
+        "L’entreprise s’engage à assurer la prestation pendant la totalité de la période de 48 mois."
+      ],
+      "final_faithfulness": 0.875,
+      "revisions": 1,
+      "lessons_used": 2,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-99151",
+      "run": 1,
+      "first_faithfulness": 1.0,
+      "first_unsupported": [],
+      "final_faithfulness": 1.0,
+      "revisions": 0,
+      "lessons_used": 2,
+      "lessons_learned": []
+    }
+  ]
+}

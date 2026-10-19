@@ -1,0 +1,113 @@
+{
+  "label": "sans_memoire_x3",
+  "memory": "off",
+  "summary": {
+    "avis": 9,
+    "fidelite_1er_jet": 0.938,
+    "non_soutenues_1er_jet": 0.56,
+    "fidelite_finale": 0.963,
+    "part_revisee": 0.556
+  },
+  "rows": [
+    {
+      "notice_id": "26-98391",
+      "run": 1,
+      "first_faithfulness": 1.0,
+      "first_unsupported": [],
+      "final_faithfulness": 1.0,
+      "revisions": 0,
+      "lessons_used": 0,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-98391",
+      "run": 2,
+      "first_faithfulness": 1.0,
+      "first_unsupported": [],
+      "final_faithfulness": 1.0,
+      "revisions": 0,
+      "lessons_used": 0,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-98391",
+      "run": 3,
+      "first_faithfulness": 1.0,
+      "first_unsupported": [],
+      "final_faithfulness": 1.0,
+      "revisions": 0,
+      "lessons_used": 0,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-98519",
+      "run": 1,
+      "first_faithfulness": 0.9090909090909091,
+      "first_unsupported": [
+        "Nous disposons de la certification ISO 14001 et mettons en œuvre des produits respectueux de l’environnement."
+      ],
+      "final_faithfulness": 0.9,
+      "revisions": 1,
+      "lessons_used": 0,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-98519",
+      "run": 2,
+      "first_faithfulness": 0.8888888888888888,
+      "first_unsupported": [
+        "Critère environnemental (1 pt) : ISO 14001 et notre démarche d’éco‑responsabilité (utilisation de produits certifiés, tri des déchets) répondent au critère environnemental."
+      ],
+      "final_faithfulness": 0.875,
+      "revisions": 1,
+      "lessons_used": 0,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-98519",
+      "run": 3,
+      "first_faithfulness": 0.9090909090909091,
+      "first_unsupported": [
+        "Nous disposons d’une équipe de 42 personnes capable de garantir la continuité du service sur 48 mois."
+      ],
+      "final_faithfulness": 1.0,
+      "revisions": 1,
+      "lessons_used": 0,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-99151",
+      "run": 1,
+      "first_faithfulness": 0.875,
+      "first_unsupported": [
+        "Le site du Centre d’enseignement zootechnique Bergerie nationale se situe dans les départements couverts par notre zone d’intervention (59, 62, 69, 75, 92, 93, 94, 95)."
+      ],
+      "final_faithfulness": 1.0,
+      "revisions": 1,
+      "lessons_used": 0,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-99151",
+      "run": 2,
+      "first_faithfulness": 1.0,
+      "first_unsupported": [],
+      "final_faithfulness": 1.0,
+      "revisions": 0,
+      "lessons_used": 0,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-99151",
+      "run": 3,
+      "first_faithfulness": 0.8571428571428571,
+      "first_unsupported": [
+        "Le siège et les équipes de Clair & Net Services sont en mesure d’intervenir sur le Centre d’enseignement zootechnique Bergerie nationale."
+      ],
+      "final_faithfulness": 0.8888888888888888,
+      "revisions": 1,
+      "lessons_used": 0,
+      "lessons_learned": []
+    }
+  ]
+}

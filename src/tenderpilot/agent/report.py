@@ -57,6 +57,12 @@ def to_markdown(state: dict) -> str:
             out += [f"- {claim}" for claim in check["unsupported"]]
         else:
             out.append("Toutes les affirmations vérifiées sont soutenues par l'avis ou le profil.")
+    if state.get("lessons_used"):
+        out += ["", "## Leçons utilisées pour la rédaction", ""]
+        out += [f"- {text}" for text in state["lessons_used"]]
+    if state.get("lessons_learned"):
+        out += ["", "## Leçons apprises ou renforcées à l'issue de cet avis", ""]
+        out += [f"- {text}" for text in state["lessons_learned"]]
     if state.get("draft"):
         out += ["", "---", "", "# Brouillon de note de candidature", "", state["draft"]]
     return "\n".join(out) + "\n"

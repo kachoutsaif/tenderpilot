@@ -202,3 +202,17 @@ def test_revision_et_profil_contiennent_ce_qu_il_faut():
     assert "[À COMPLÉTER]" in messages[0]["content"]
     profile = CompanyProfile(nom="T", activites=["x"], departements=["59", "62"])
     assert "59, 62" in _profile_block(profile)  # la zone est donnée au rédacteur et au juge
+
+
+def test_contexte_separe_des_exigences_a_traiter():
+    from tenderpilot.agent.drafting import _requirements_block
+
+    req = _req(
+        duree=verified("48 mois"),
+        criteres=[verified("Prix 40 %")],
+    )
+    block = _requirements_block(req)
+    context, to_answer = block.split("EXIGENCES À TRAITER :")
+    assert "48 mois" in context and "48 mois" not in to_answer
+    assert "Prix 40 %" in to_answer
+    assert "(aucune)" in _requirements_block(_req(duree=verified("12 mois")))

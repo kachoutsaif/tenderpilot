@@ -1,0 +1,48 @@
+{
+  "label": "sans_memoire",
+  "memory": "off",
+  "summary": {
+    "avis": 3,
+    "fidelite_1er_jet": 0.892,
+    "non_soutenues_1er_jet": 1,
+    "fidelite_finale": 0.952,
+    "part_revisee": 0.667
+  },
+  "rows": [
+    {
+      "notice_id": "26-98391",
+      "run": 1,
+      "first_faithfulness": 1.0,
+      "first_unsupported": [],
+      "final_faithfulness": 1.0,
+      "revisions": 0,
+      "lessons_used": 0,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-98519",
+      "run": 1,
+      "first_faithfulness": 0.8,
+      "first_unsupported": [
+        "Nous intervenons sur le site de Maubeuge avec notre équipe locale.",
+        "Nous nous engageons à assurer l’entretien et le nettoyage pendant 48 mois consécutifs."
+      ],
+      "final_faithfulness": 1.0,
+      "revisions": 1,
+      "lessons_used": 0,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-99151",
+      "run": 1,
+      "first_faithfulness": 0.875,
+      "first_unsupported": [
+        "Le site du Centre d'enseignement zootechnique Bergerie nationale se situe dans les départements 59, 62, 69, 75, 92, 93, 94, 95, qui font partie de notre zone d’intervention."
+      ],
+      "final_faithfulness": 0.8571428571428571,
+      "revisions": 1,
+      "lessons_used": 0,
+      "lessons_learned": []
+    }
+  ]
+}

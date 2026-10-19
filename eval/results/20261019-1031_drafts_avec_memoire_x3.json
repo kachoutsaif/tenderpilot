@@ -1,0 +1,112 @@
+{
+  "label": "avec_memoire_x3",
+  "memory": "use",
+  "summary": {
+    "avis": 9,
+    "fidelite_1er_jet": 0.932,
+    "non_soutenues_1er_jet": 0.56,
+    "fidelite_finale": 1.0,
+    "part_revisee": 0.444
+  },
+  "rows": [
+    {
+      "notice_id": "26-98391",
+      "run": 1,
+      "first_faithfulness": 1.0,
+      "first_unsupported": [],
+      "final_faithfulness": 1.0,
+      "revisions": 0,
+      "lessons_used": 2,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-98391",
+      "run": 2,
+      "first_faithfulness": 1.0,
+      "first_unsupported": [],
+      "final_faithfulness": 1.0,
+      "revisions": 0,
+      "lessons_used": 2,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-98391",
+      "run": 3,
+      "first_faithfulness": 0.9,
+      "first_unsupported": [
+        "L’entreprise possède des équipes spécialisées dans le nettoyage de façades."
+      ],
+      "final_faithfulness": 1.0,
+      "revisions": 1,
+      "lessons_used": 2,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-98519",
+      "run": 1,
+      "first_faithfulness": 1.0,
+      "first_unsupported": [],
+      "final_faithfulness": 1.0,
+      "revisions": 0,
+      "lessons_used": 2,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-98519",
+      "run": 2,
+      "first_faithfulness": 1.0,
+      "first_unsupported": [],
+      "final_faithfulness": 1.0,
+      "revisions": 0,
+      "lessons_used": 2,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-98519",
+      "run": 3,
+      "first_faithfulness": 0.7777777777777778,
+      "first_unsupported": [
+        "Nous disposons d’équipes basées dans le département 59 et pouvons intervenir directement sur le site de Maubeuge.",
+        "Nous proposons un contrat de prestation sur 48 mois, renouvelable selon les modalités du cahier des charges."
+      ],
+      "final_faithfulness": 1.0,
+      "revisions": 1,
+      "lessons_used": 2,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-99151",
+      "run": 1,
+      "first_faithfulness": 0.8571428571428571,
+      "first_unsupported": [
+        "Le site du Centre d'enseignement zootechnique Bergerie nationale sera pris en charge par nos équipes."
+      ],
+      "final_faithfulness": 1.0,
+      "revisions": 1,
+      "lessons_used": 2,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-99151",
+      "run": 2,
+      "first_faithfulness": 0.8571428571428571,
+      "first_unsupported": [
+        "Le personnel de Clair & Net Services intervient sur le site du Centre d'enseignement zootechnique Bergerie nationale."
+      ],
+      "final_faithfulness": 1.0,
+      "revisions": 1,
+      "lessons_used": 2,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-99151",
+      "run": 3,
+      "first_faithfulness": 1.0,
+      "first_unsupported": [],
+      "final_faithfulness": 1.0,
+      "revisions": 0,
+      "lessons_used": 2,
+      "lessons_learned": []
+    }
+  ]
+}

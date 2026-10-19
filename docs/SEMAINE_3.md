@@ -72,6 +72,42 @@ D'où une **boucle d'auto-correction** : si des affirmations ne sont pas soutenu
 puis le brouillon est revérifié. La boucle est **bornée** (1 révision par défaut) : un agent
 qui peut boucler sans limite peut aussi consommer des tokens sans limite.
 
+## Mémoire de leçons : l'agent apprend de ses erreurs (pattern Reflexion)
+
+La boucle vérifier ⇄ réviser corrige une erreur **pendant** une exécution, mais l'agent oublie
+tout ensuite : il refait la même erreur sur l'avis suivant et paie une révision de plus.
+
+```
+erreurs relevées par le juge ──► réflexion (LLM) ──► leçon GÉNÉRALE ──► table lessons
+leçon donnée par l'humain    ──────────────────────────────────────────┘        │
+                                                                                 ▼
+                                        prompt du rédacteur (10 meilleures leçons, humain d'abord)
+```
+
+- **Généraliser** : « entretien quotidien » (erreur précise) devient « Ne pas indiquer de
+  fréquence d'intervention absente de l'avis » (valable pour tous les avis).
+- **Pas de doublons** : le LLM voit les leçons existantes et renforce l'une d'elles
+  (compteur) au lieu d'en écrire une nouvelle équivalente.
+- **Transparence** : `python scripts/lessons.py` liste les leçons, `delete N` en supprime une.
+  Une mauvaise leçon peut dégrader l'agent : on doit pouvoir la voir et la retirer.
+
+### Mesurer l'apprentissage : protocole entraînement / test
+
+```bash
+python scripts/lessons.py clear
+python scripts/measure_drafts.py --set test  --memory off   --label sans_memoire
+python scripts/measure_drafts.py --set train --memory learn --label apprentissage
+python scripts/measure_drafts.py --set test  --memory use   --label avec_memoire
+```
+
+Les leçons sont apprises sur 3 avis (train) et évaluées sur 3 AUTRES avis (test), comme en
+machine learning : sinon on mesurerait la mémorisation, pas l'apprentissage. L'extraction est
+mise en cache pour que les deux conditions rédigent à partir des mêmes exigences.
+Indicateur principal : la fidélité du **premier** brouillon, avant révision.
+
+**Limite à dire en entretien :** 3 avis de test, c'est peu, et le LLM varie d'un lancement à
+l'autre ; `--repeat 3` relance chaque avis pour moyenner.
+
 ## Lancer l'agent
 
 ```bash
@@ -89,3 +125,6 @@ Le profil fictif est dans `profiles/exemple_proprete.toml`. Le rapport est écri
 - Pourquoi la décision GO / NO-GO n'est-elle pas confiée au LLM ?
 - Comment mesurer la qualité de l'extraction ? (taux de preuves retrouvées, et ses limites)
 - Une exigence peut avoir une preuve valide mais une valeur mal comprise : comment le détecter ?
+- Quelle différence entre se corriger (Évaluateur-Optimiseur) et apprendre (Reflexion) ?
+- Pourquoi une mémoire de leçons plutôt qu'un fine-tuning ? Quels sont ses risques ?
+- Pourquoi séparer avis d'entraînement et avis de test pour mesurer l'apprentissage ?

@@ -1,0 +1,108 @@
+{
+  "label": "lecons_humaines_x3",
+  "memory": "use",
+  "summary": {
+    "avis": 9,
+    "fidelite_1er_jet": 0.966,
+    "non_soutenues_1er_jet": 0.33,
+    "fidelite_finale": 0.981,
+    "part_revisee": 0.222
+  },
+  "rows": [
+    {
+      "notice_id": "26-98391",
+      "run": 1,
+      "first_faithfulness": 1.0,
+      "first_unsupported": [],
+      "final_faithfulness": 1.0,
+      "revisions": 0,
+      "lessons_used": 5,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-98391",
+      "run": 2,
+      "first_faithfulness": 1.0,
+      "first_unsupported": [],
+      "final_faithfulness": 1.0,
+      "revisions": 0,
+      "lessons_used": 5,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-98391",
+      "run": 3,
+      "first_faithfulness": 0.8571428571428571,
+      "first_unsupported": [
+        "Nous disposons d’attestations de formation pour nos équipes sur les techniques de dosage écoresponsables et l’utilisation raisonnée de l’eau",
+        "Nous fournirons les justificatifs attestant de notre gestion conforme et de la valorisation des déchets chimiques générés"
+      ],
+      "final_faithfulness": 0.8333333333333334,
+      "revisions": 1,
+      "lessons_used": 5,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-98519",
+      "run": 1,
+      "first_faithfulness": 1.0,
+      "first_unsupported": [],
+      "final_faithfulness": 1.0,
+      "revisions": 0,
+      "lessons_used": 5,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-98519",
+      "run": 2,
+      "first_faithfulness": 1.0,
+      "first_unsupported": [],
+      "final_faithfulness": 1.0,
+      "revisions": 0,
+      "lessons_used": 5,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-98519",
+      "run": 3,
+      "first_faithfulness": 1.0,
+      "first_unsupported": [],
+      "final_faithfulness": 1.0,
+      "revisions": 0,
+      "lessons_used": 5,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-99151",
+      "run": 1,
+      "first_faithfulness": 0.8333333333333334,
+      "first_unsupported": [
+        "Le site du Centre d’enseignement zootechnique Bergerie nationale est couvert par la zone d’intervention de Clair & Net Services."
+      ],
+      "final_faithfulness": 1.0,
+      "revisions": 1,
+      "lessons_used": 5,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-99151",
+      "run": 2,
+      "first_faithfulness": 1.0,
+      "first_unsupported": [],
+      "final_faithfulness": 1.0,
+      "revisions": 0,
+      "lessons_used": 5,
+      "lessons_learned": []
+    },
+    {
+      "notice_id": "26-99151",
+      "run": 3,
+      "first_faithfulness": 1.0,
+      "first_unsupported": [],
+      "final_faithfulness": 1.0,
+      "revisions": 0,
+      "lessons_used": 5,
+      "lessons_learned": []
+    }
+  ]
+}

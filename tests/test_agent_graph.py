@@ -10,6 +10,7 @@ pytest.importorskip("langgraph")
 from langgraph.types import Command  # noqa: E402
 
 from tenderpilot.agent.graph import build_agent  # noqa: E402
+from tenderpilot.agent.memory import HUMAN, InMemoryLessonStore, Lesson  # noqa: E402
 from tenderpilot.agent.profile import CompanyProfile  # noqa: E402
 from tenderpilot.ingestion.boamp import record_to_notice  # noqa: E402
 
@@ -109,3 +110,50 @@ def test_revisions_bornees(sample_records):
     state = agent.invoke(Command(resume="GO"), config)
     assert state["revisions"] == 1  # max_revisions = 1 : on s'arrête même si ce n'est pas fidèle
     assert state["draft_check"]["unsupported"] == ["X"]
+
+
+def test_memoire_de_lecons_utilisee_puis_enrichie(sample_records):
+    profile = CompanyProfile(nom="Test", activites=["nettoyage"], chiffre_affaires=1_000_000)
+    lessons = InMemoryLessonStore([Lesson(1, "Ne pas inventer de fréquence.", "juge", 2)])
+    bad = '{"claims": [{"claim": "Prestation quotidienne", "supported": false}]}'
+    good = '{"claims": [{"claim": "Nettoyage", "supported": true}]}'
+    reflection = '{"lessons": [{"existing": 1}, {"new": "Ne pas écrire que l\'offre garantit."}]}'
+    llm = SequenceLLM(EXTRACTION, "brouillon", bad, "brouillon corrigé", good, reflection)
+    agent = build_agent(
+        NoticeStore(sample_records), llm, profile, today=date(2026, 10, 20), lessons=lessons
+    )
+    config = {"configurable": {"thread_id": "t6"}}
+    agent.invoke({"notice_id": "TEST-0001"}, config)
+    state = agent.invoke(
+        Command(resume={"decision": "GO", "lesson": "Ne pas promettre de délai."}), config
+    )
+
+    assert "Ne pas inventer de fréquence." in llm.calls[1][0]["content"]  # injectée au rédacteur
+    assert state["lessons_used"] == ["Ne pas inventer de fréquence."]
+    assert "Prestation quotidienne" in llm.calls[5][1]["content"]  # erreurs du 1er jet analysées
+    texts = {lesson.text: lesson for lesson in lessons.all()}
+    assert texts["Ne pas promettre de délai."].source == HUMAN
+    assert texts["Ne pas inventer de fréquence."].count == 3
+    assert "Ne pas écrire que l'offre garantit." in texts
+    assert len(state["lessons_learned"]) == 3
+
+
+def test_memoire_en_lecture_seule(sample_records):
+    profile = CompanyProfile(nom="Test", activites=["nettoyage"], chiffre_affaires=1_000_000)
+    lessons = InMemoryLessonStore([Lesson(1, "Ne pas inventer de fréquence.", "juge", 2)])
+    bad = '{"claims": [{"claim": "X", "supported": false}]}'
+    llm = SequenceLLM(EXTRACTION, "brouillon", bad, "brouillon 2", bad)
+    agent = build_agent(
+        NoticeStore(sample_records),
+        llm,
+        profile,
+        today=date(2026, 10, 20),
+        lessons=lessons,
+        learn=False,
+    )
+    config = {"configurable": {"thread_id": "t7"}}
+    agent.invoke({"notice_id": "TEST-0001"}, config)
+    state = agent.invoke(Command(resume="GO"), config)
+    assert state["lessons_used"] == ["Ne pas inventer de fréquence."]
+    assert state["lessons_learned"] == [] and len(llm.calls) == 5  # pas d'appel de réflexion
+    assert len(lessons.all()) == 1

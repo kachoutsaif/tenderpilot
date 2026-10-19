@@ -16,6 +16,7 @@ import uuid
 from pathlib import Path
 
 from tenderpilot.agent.graph import build_agent, parse_review
+from tenderpilot.agent.memory import PgLessonStore
 from tenderpilot.agent.profile import load_profile
 from tenderpilot.agent.report import LABELS, checks_lines, requirements_lines, to_markdown
 from tenderpilot.config import get_settings
@@ -40,7 +41,10 @@ def ask_human(payload: dict, state: dict) -> dict:
             break
         except ValueError as exc:
             print(f"  {exc}")
-    review["comment"] = input("Commentaire pour la rédaction (facultatif) : ").strip()
+    review["comment"] = input("Commentaire pour CE brouillon (facultatif) : ").strip()
+    review["lesson"] = input(
+        "Leçon à retenir pour TOUS les prochains brouillons (facultatif) : "
+    ).strip()
     return review
 
 
@@ -49,6 +53,12 @@ def main() -> None:
     parser.add_argument("notice_id")
     parser.add_argument("--profile", default="profiles/exemple_proprete.toml")
     parser.add_argument("--yes", action="store_true", help="valide la décision sans demander")
+    parser.add_argument(
+        "--memory",
+        choices=["learn", "use", "off"],
+        default="learn",
+        help="learn : utilise et enrichit les leçons ; use : les utilise seulement ; off : aucune",
+    )
     args = parser.parse_args()
 
     from langgraph.types import Command
@@ -64,7 +74,8 @@ def main() -> None:
         max_tokens=4000,  # l'extraction JSON et le brouillon sont plus longs qu'une réponse
         **options,
     )
-    agent = build_agent(store, llm, profile)
+    lessons = PgLessonStore(store.conn) if args.memory != "off" else None
+    agent = build_agent(store, llm, profile, lessons=lessons, learn=args.memory == "learn")
     config = {"configurable": {"thread_id": f"{args.notice_id}-{uuid.uuid4().hex[:8]}"}}
 
     print(f"Profil : {profile.nom}. Analyse de l'avis {args.notice_id}...")
@@ -88,6 +99,11 @@ def main() -> None:
         print(f"\nContrôle du brouillon : fidélité {steps or format(check['faithfulness'], '.0%')}")
         for claim in check["unsupported"]:
             print(f"  NON SOUTENU (restant) : {claim}")
+
+    if state.get("lessons_used"):
+        print(f"Leçons utilisées : {len(state['lessons_used'])}")
+    for text in state.get("lessons_learned", []):
+        print(f"  LEÇON retenue : {text}")
 
     out = Path("out") / f"{args.notice_id}.md"
     out.parent.mkdir(exist_ok=True)

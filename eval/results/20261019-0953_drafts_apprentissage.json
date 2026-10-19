@@ -1,0 +1,52 @@
+{
+  "label": "apprentissage",
+  "memory": "learn",
+  "summary": {
+    "avis": 3,
+    "fidelite_1er_jet": 0.869,
+    "non_soutenues_1er_jet": 1,
+    "fidelite_finale": 0.972,
+    "part_revisee": 0.667
+  },
+  "rows": [
+    {
+      "notice_id": "26-98400",
+      "run": 1,
+      "first_faithfulness": 0.8571428571428571,
+      "first_unsupported": [
+        "Nous nous engageons à assurer le sur‑entretien et la propreté pendant toute la période contractuelle de 12 mois.",
+        "Nous nous engageons à atteindre les niveaux de propreté définis dans le cahier des charges, sous réserve des moyens décrits en section 2."
+      ],
+      "final_faithfulness": 0.9166666666666666,
+      "revisions": 1,
+      "lessons_used": 0,
+      "lessons_learned": [
+        "Ne pas promettre d’engagements ou de performances non prévus dans le cahier des charges"
+      ]
+    },
+    {
+      "notice_id": "26-98454",
+      "run": 1,
+      "first_faithfulness": 0.75,
+      "first_unsupported": [
+        "Lieu d’exécution : prestation à réaliser à Cherbourg‑En‑Cotentin (département 50)."
+      ],
+      "final_faithfulness": 1.0,
+      "revisions": 1,
+      "lessons_used": 1,
+      "lessons_learned": [
+        "Ne pas indiquer un lieu d’exécution différent de celui spécifié dans le cahier des charges"
+      ]
+    },
+    {
+      "notice_id": "26-98934",
+      "run": 1,
+      "first_faithfulness": 1.0,
+      "first_unsupported": [],
+      "final_faithfulness": 1.0,
+      "revisions": 0,
+      "lessons_used": 2,
+      "lessons_learned": []
+    }
+  ]
+}
