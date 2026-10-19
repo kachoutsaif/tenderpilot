@@ -188,6 +188,19 @@ class PgVectorStore:
         keys = ("id", "title", "buyer", "deadline", "morceaux")
         return [dict(zip(keys, r, strict=True)) for r in rows]
 
+    def get_notice(self, notice_id: str) -> Notice | None:
+        """L'avis complet, reconstruit depuis l'enregistrement BOAMP d'origine (colonne raw).
+
+        On ne recolle pas les morceaux : ils se chevauchent, le texte serait répété.
+        """
+        from tenderpilot.ingestion.boamp import record_to_notice
+
+        row = self.conn.execute("SELECT raw FROM notices WHERE id = %s", (notice_id,)).fetchone()
+        if row is None or not row[0]:
+            return None
+        raw = row[0] if isinstance(row[0], dict) else json.loads(row[0])
+        return record_to_notice(raw)
+
     def list_notices(self, limit: int = 20) -> list[dict]:
         rows = self.conn.execute(
             "SELECT id, title, buyer, published, deadline, url FROM notices "

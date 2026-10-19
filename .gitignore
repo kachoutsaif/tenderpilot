@@ -10,3 +10,4 @@ build/
 dist/
 data/
 .DS_Store
+out/

@@ -20,6 +20,7 @@ dependencies = [
   "openai>=1.30",
   "fastembed>=0.3",
   "pypdf>=4.0",
+  "langgraph>=1.0,<2",
 ]
 
 [project.optional-dependencies]

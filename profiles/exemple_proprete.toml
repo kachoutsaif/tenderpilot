@@ -1,0 +1,28 @@
+# Profil d'entreprise FICTIF, utilisé pour la démonstration de l'agent.
+# Copiez ce fichier et adaptez-le à une vraie PME.
+
+nom = "Clair & Net Services (fictive)"
+description = "PME de nettoyage et de propreté pour les collectivités et les bâtiments publics."
+
+# mots-clés de l'activité : un avis doit en contenir au moins un dans son objet ou ses mots-clés
+activites = ["nettoyage", "propreté", "proprete", "entretien des locaux", "vitrerie", "vitres", "ménage"]
+
+# zone d'intervention (codes département). Liste vide = toute la France.
+departements = ["59", "62", "69", "75", "92", "93", "94", "95"]
+
+chiffre_affaires = 1_800_000   # euros, dernier exercice
+effectif = 42
+certifications = ["ISO 9001", "ISO 14001", "Qualipropre"]
+
+# nombre de jours minimum pour préparer une réponse sérieuse
+delai_minimum_jours = 10
+
+[[references]]
+titre = "Nettoyage des locaux de la mairie de Roubaix (6 bâtiments, 9 000 m²)"
+annee = 2025
+montant = 210_000
+
+[[references]]
+titre = "Nettoyage des vitres et façades vitrées d'un groupe scolaire à Villeurbanne"
+annee = 2024
+montant = 48_000

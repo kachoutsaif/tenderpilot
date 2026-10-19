@@ -89,3 +89,12 @@ def test_search_fulltext_sans_accents_ni_majuscules(pg_store, sample_records):
     assert results and results[0].notice_id == "TEST-0002"
     assert results[0].score > 0
     assert store.search_fulltext("zzzz introuvable", k=3) == []
+
+
+def test_get_notice_reconstruit_l_avis_complet(pg_store, sample_records):
+    store, embedder = pg_store
+    original = record_to_notice(sample_records[0])
+    ingest_notice(original, embedder, store, max_chars=200, overlap=50)
+    notice = store.get_notice(original.id)
+    assert notice.text == original.text  # pas de répétition due au chevauchement
+    assert store.get_notice("INCONNU") is None
