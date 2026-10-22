@@ -18,7 +18,13 @@ from pathlib import Path
 from tenderpilot.agent.graph import build_agent, parse_review
 from tenderpilot.agent.memory import PgLessonStore
 from tenderpilot.agent.profile import load_profile
-from tenderpilot.agent.report import LABELS, checks_lines, requirements_lines, to_markdown
+from tenderpilot.agent.report import (
+    LABELS,
+    checks_lines,
+    notice_facts_lines,
+    requirements_lines,
+    to_markdown,
+)
 from tenderpilot.config import get_settings
 from tenderpilot.rag.llm import OpenAICompatibleLLM
 from tenderpilot.store import PgVectorStore
@@ -29,6 +35,8 @@ def ask_human(payload: dict, state: dict) -> dict:
     print("\nExigences extraites :")
     for line in requirements_lines(state.get("requirements", {})):
         print(f"  {line}")
+    for line in notice_facts_lines(state.get("notice", {})):
+        print(f"  {line}" if line.startswith("-") else line)
     print("\nContrôles :")
     for line in checks_lines(payload["checks"]):
         print(f"  {line}")

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from tenderpilot.agent.extraction import Requirements
+from tenderpilot.agent.structure import lot_lines
 
 LABELS = {"GO": "GO", "A_ETUDIER": "À ÉTUDIER", "NO_GO": "NO-GO"}
 STATUS = {"ok": "OK", "ko": "KO", "inconnu": "??", "a_verifier": "À VÉRIFIER"}
@@ -14,6 +15,18 @@ def checks_lines(checks: list[dict]) -> list[str]:
         flag = " (bloquant)" if c["status"] == "ko" and c.get("blocking") else ""
         lines.append(f"[{STATUS.get(c['status'], c['status'])}] {c['name']} : {c['detail']}{flag}")
     return lines
+
+
+def notice_facts_lines(notice: dict) -> list[str]:
+    """Lots et modifications (rectificatif), lus sans LLM dans le texte de l'avis."""
+    out: list[str] = []
+    if notice.get("lots"):
+        out += ["", f"## Lots ({len(notice['lots'])})", ""]
+        out += [f"- {line}" for line in lot_lines(notice["lots"])]
+    if notice.get("modifications"):
+        out += ["", "## Avis rectifié : modifications", ""]
+        out += [f"- {change}" for change in notice["modifications"]]
+    return out
 
 
 def requirements_lines(requirements: dict) -> list[str]:
@@ -35,6 +48,7 @@ def to_markdown(state: dict) -> str:
         out.append(f"- Lien : {notice['url']}")
     out += ["", f"## Décision proposée par les règles : {LABELS.get(state.get('decision'), '-')}"]
     out += ["", *[f"- {line}" for line in checks_lines(state.get("checks", []))]]
+    out += notice_facts_lines(notice)
     review = state.get("review")
     if review:
         out += ["", f"## Décision validée par l'humain : {LABELS[review['decision']]}"]

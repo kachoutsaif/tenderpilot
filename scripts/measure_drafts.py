@@ -17,7 +17,6 @@ La décision est forcée à GO pour toujours obtenir un brouillon.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import time
 import uuid
@@ -25,7 +24,7 @@ from datetime import datetime
 from pathlib import Path
 from statistics import mean
 
-from tenderpilot.agent.extraction import Requirements, extract_requirements
+from tenderpilot.agent.cache import make_cached_extract
 from tenderpilot.agent.graph import build_agent
 from tenderpilot.agent.memory import PgLessonStore
 from tenderpilot.agent.profile import load_profile
@@ -38,18 +37,48 @@ SETS = {
     "train": ["26-98400", "26-98454", "26-98934"],
     "test": ["26-98391", "26-98519", "26-99151"],
 }
-CACHE = Path("out/cache")
 
 
-def cached_extract(llm, title: str, text: str) -> Requirements:
-    key = hashlib.sha256(text.encode()).hexdigest()[:16]
-    path = CACHE / f"{key}.json"
-    if path.exists():
-        return Requirements.model_validate_json(path.read_text(encoding="utf-8"))
-    requirements = extract_requirements(llm, title, text)
-    CACHE.mkdir(parents=True, exist_ok=True)
-    path.write_text(requirements.model_dump_json(indent=2), encoding="utf-8")
-    return requirements
+def measure_one(agent, command, notice_id: str, run: int) -> dict | None:
+    config = {"configurable": {"thread_id": f"{notice_id}-{uuid.uuid4().hex[:8]}"}}
+    state = agent.invoke({"notice_id": notice_id}, config)
+    if state.get("error"):
+        print(f"  {notice_id} : {state['error']}")
+        return None
+    state = agent.invoke(command(resume={"decision": "GO"}), config)
+    history = state["draft_history"]
+    row = {
+        "notice_id": notice_id,
+        "run": run + 1,
+        "first_faithfulness": history[0]["faithfulness"],
+        "first_unsupported": history[0]["unsupported"],
+        "final_faithfulness": history[-1]["faithfulness"],
+        "revisions": state.get("revisions", 0),
+        "lessons_used": len(state.get("lessons_used", [])),
+        "lessons_learned": state.get("lessons_learned", []),
+    }
+    print(
+        f"  {notice_id} #{run + 1} : 1er jet {row['first_faithfulness']:.0%} "
+        f"({len(row['first_unsupported'])} non soutenue(s)), final "
+        f"{row['final_faithfulness']:.0%}, révisions {row['revisions']}, "
+        f"leçons utilisées {row['lessons_used']}"
+    )
+    for text in row["lessons_learned"]:
+        print(f"      leçon : {text}")
+    return row
+
+
+def save(out: Path, args, rows: list[dict]) -> dict:
+    summary = {
+        "avis": len(rows),
+        "fidelite_1er_jet": round(mean(r["first_faithfulness"] for r in rows), 3),
+        "non_soutenues_1er_jet": round(mean(len(r["first_unsupported"]) for r in rows), 2),
+        "fidelite_finale": round(mean(r["final_faithfulness"] for r in rows), 3),
+        "part_revisee": round(mean(r["revisions"] > 0 for r in rows), 3),
+    }
+    payload = {"label": args.label, "memory": args.memory, "summary": summary, "rows": rows}
+    out.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    return summary
 
 
 def main() -> None:
@@ -82,55 +111,30 @@ def main() -> None:
         load_profile(args.profile),
         lessons=lessons,
         learn=args.memory == "learn",
-        extract_fn=cached_extract,
+        extract_fn=make_cached_extract(),
     )
 
     ids = args.ids or SETS[args.set]
     print(f"{len(ids)} avis × {args.repeat}, mémoire « {args.memory} », « {args.label} »")
-    rows = []
-    for notice_id in ids:
-        for run in range(args.repeat):
-            config = {"configurable": {"thread_id": f"{notice_id}-{uuid.uuid4().hex[:8]}"}}
-            state = agent.invoke({"notice_id": notice_id}, config)
-            if state.get("error"):
-                print(f"  {notice_id} : {state['error']}")
-                break
-            state = agent.invoke(Command(resume={"decision": "GO"}), config)
-            history = state["draft_history"]
-            row = {
-                "notice_id": notice_id,
-                "run": run + 1,
-                "first_faithfulness": history[0]["faithfulness"],
-                "first_unsupported": history[0]["unsupported"],
-                "final_faithfulness": history[-1]["faithfulness"],
-                "revisions": state.get("revisions", 0),
-                "lessons_used": len(state.get("lessons_used", [])),
-                "lessons_learned": state.get("lessons_learned", []),
-            }
-            rows.append(row)
-            print(
-                f"  {notice_id} #{run + 1} : 1er jet {row['first_faithfulness']:.0%} "
-                f"({len(row['first_unsupported'])} non soutenue(s)), final "
-                f"{row['final_faithfulness']:.0%}, révisions {row['revisions']}, "
-                f"leçons utilisées {row['lessons_used']}"
-            )
-            for text in row["lessons_learned"]:
-                print(f"      leçon : {text}")
-            time.sleep(args.pause)  # limite de tokens par minute de l'offre gratuite
+    rows: list[dict] = []
+    out = Path("eval/results") / f"{datetime.now():%Y%m%d-%H%M}_drafts_{args.label}.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        for notice_id in ids:
+            for run in range(args.repeat):
+                row = measure_one(agent, Command, notice_id, run)
+                if row is None:
+                    break
+                rows.append(row)
+                save(out, args, rows)  # sauvegarde après CHAQUE brouillon
+                time.sleep(args.pause)  # limite de tokens par minute de l'offre gratuite
+    except Exception as exc:  # ex. quota journalier atteint (429) : on garde ce qui est fait
+        print(f"\nArrêt : {type(exc).__name__}: {str(exc)[:200]}")
+        print(f"{len(rows)} brouillon(s) mesuré(s) avant l'arrêt, déjà enregistrés.")
 
     if rows:
-        summary = {
-            "avis": len(rows),
-            "fidelite_1er_jet": round(mean(r["first_faithfulness"] for r in rows), 3),
-            "non_soutenues_1er_jet": round(mean(len(r["first_unsupported"]) for r in rows), 2),
-            "fidelite_finale": round(mean(r["final_faithfulness"] for r in rows), 3),
-            "part_revisee": round(mean(r["revisions"] > 0 for r in rows), 3),
-        }
+        summary = save(out, args, rows)
         print("\n" + "  ".join(f"{k} = {v}" for k, v in summary.items()))
-        out = Path("eval/results") / f"{datetime.now():%Y%m%d-%H%M}_drafts_{args.label}.json"
-        out.parent.mkdir(parents=True, exist_ok=True)
-        payload = {"label": args.label, "memory": args.memory, "summary": summary, "rows": rows}
-        out.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
         print(f"Détail : {out}")
     store.close()
 

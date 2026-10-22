@@ -21,7 +21,11 @@ dependencies = [
   "fastembed>=0.3",
   "pypdf>=4.0",
   "langgraph>=1.0,<2",
+  "mcp>=2.2,<3",
 ]
+
+[project.scripts]
+tenderpilot-mcp = "tenderpilot.mcpserver.server:main"
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0", "ruff>=0.4"]

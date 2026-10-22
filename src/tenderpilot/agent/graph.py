@@ -37,6 +37,7 @@ from tenderpilot.agent.rules import (
     notice_departments,
     qualify,
 )
+from tenderpilot.agent.structure import lot_lines, parse_lots, parse_modifications
 from tenderpilot.models import Notice
 
 
@@ -73,6 +74,9 @@ def notice_to_dict(notice: Notice) -> dict[str, Any]:
         "url": notice.url,
         "departments": notice_departments(notice.raw),
         "keywords": keywords if isinstance(keywords, list) else [keywords],
+        "rectificatif": str(notice.raw.get("etat", "")).upper() == "RECTIFICATIF",
+        "lots": parse_lots(notice.text),
+        "modifications": parse_modifications(notice.text),
     }
 
 
@@ -172,12 +176,14 @@ def build_agent(
             state["review"]["decision"],
             state["review"].get("comment", ""),
             used,
+            lots=lot_lines(state["notice"].get("lots", [])),
         )
         return {"draft": llm.complete(messages), "revisions": 0, "lessons_used": used}
 
     def verifier_brouillon(state: AgentState) -> dict:
         requirements = Requirements.model_validate(state["requirements"])
-        check = check_draft(llm, state["draft"], requirements, profile)
+        lots = lot_lines(state["notice"].get("lots", []))
+        check = check_draft(llm, state["draft"], requirements, profile, lots=lots)
         return {"draft_check": check, "draft_history": [check]}
 
     def reviser(state: AgentState) -> dict:

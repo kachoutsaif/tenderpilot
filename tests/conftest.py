@@ -89,6 +89,9 @@ class InMemoryStore:
             for s, c in scored[:k]
         ]
 
+    def get_notice(self, notice_id):
+        return self.notices.get(notice_id)
+
     def list_notices(self, limit=20):
         return [{"id": n.id, "title": n.title} for n in list(self.notices.values())[:limit]]
 

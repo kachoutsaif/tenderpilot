@@ -108,6 +108,51 @@ Indicateur principal : la fidélité du **premier** brouillon, avant révision.
 **Limite à dire en entretien :** 3 avis de test, c'est peu, et le LLM varie d'un lancement à
 l'autre ; `--repeat 3` relance chaque avis pour moyenner.
 
+### Résultats (19/10, 3 avis de test × 3 lancements, gpt-oss-120b)
+
+| Condition | Erreurs au 1er jet (9 brouillons) | Brouillons révisés | Fidélité finale |
+|---|---|---|---|
+| sans mémoire | 5 | 5 | 96 % |
+| 2 leçons apprises automatiquement | 5 | 4 | 100 % |
+| 5 leçons, dont 3 écrites à partir des erreurs mesurées | 5 | 4 | 100 % |
+
+Ce que montrent ces chiffres :
+
+1. **Un seul lancement trompe.** Avec 1 lancement par avis, la mémoire semblait apporter
+   +2,7 points ; avec 3 lancements, l'écart disparaît : c'était la variabilité du LLM.
+2. **Les leçons apprises automatiquement ne visaient pas les erreurs fréquentes** : 3 avis
+   d'entraînement ne contenaient pas ces erreurs. L'agent n'apprend que ce qu'il a vu.
+3. **Les leçons ciblées fonctionnent... et les erreurs se déplacent** (effet « tape-taupe ») :
+   zone 5 → 0, pratiques environnementales 2 → 0, mais engagements sur la durée 1 → 3.
+   Le total ne dit rien : il faut regarder la RÉPARTITION des erreurs.
+4. **La cause était dans la structure du prompt** : on demandait « une réponse par exigence »,
+   y compris pour « durée : 48 mois ». Correction : le CONTEXTE (lieu, durée, montant) est
+   séparé des EXIGENCES À TRAITER. Principe : *ce qui peut être une règle ne doit pas être
+   une leçon.* (Mesure de ce correctif : à venir.)
+5. **Évaluer coûte cher** : ces mesures ont épuisé le quota quotidien de Groq (200 000 tokens).
+
+## Cas réel : l'avis 26-98519 comparé à boamp.fr
+
+En suivant cet avis de la source jusqu'à l'agent (boamp.fr → API → texte → base → agent), on a
+trouvé deux informations importantes que l'agent ignorait :
+
+| Information | API | Texte | Base | Agent (avant) |
+|---|---|---|---|---|
+| 2 lots (CTM/Police ; CMA/Maison Sport-Santé) | oui | oui | oui | **non** |
+| Rectificatif : date limite reportée, pièces modifiées | oui | oui | oui | **non** |
+
+L'ingestion était correcte : l'information se perdait à l'extraction, faute de case
+« lots ». Méthode : **remonter le flux jusqu'à l'endroit où l'information disparaît.**
+
+Correction (`agent/structure.py`) : lots et modifications sont lus **sans LLM**, car notre
+lecteur eForms les écrit dans un format fixe. Les lots sont transmis au rédacteur (une PME
+peut répondre à un seul lot ; la durée peut différer d'un lot à l'autre) et un 6e contrôle
+« rectificatif » (À VÉRIFIER) signale les modifications à relire.
+
+Autres points vus sur ce cas : la date limite arrive en UTC (11:00) et s'affiche en heure de
+Paris (12:00) ; `annonce_lie` est vide, donc aucune ancienne version n'a été supprimée ; l'avis
+contient le nom et les coordonnées d'un agent public, que le projet n'indexe pas (RGPD).
+
 ## Lancer l'agent
 
 ```bash

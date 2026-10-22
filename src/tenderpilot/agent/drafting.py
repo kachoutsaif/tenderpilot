@@ -61,9 +61,10 @@ def _profile_block(profile: CompanyProfile) -> str:
 CONTEXT_FIELDS = ("lieu_execution", "duree", "montant_estime")
 
 
-def _requirements_block(requirements: Requirements) -> str:
+def _requirements_block(requirements: Requirements, lots: list[str] | None = None) -> str:
     verified = [(name, item) for name, item in requirements.items() if item.verified]
     context = [f"- {n} : {i.value}" for n, i in verified if n in CONTEXT_FIELDS]
+    context += [f"- {line}" for line in lots or []]
     to_answer = [f"- {n} : {i.value}" for n, i in verified if n not in CONTEXT_FIELDS]
     return "\n".join(
         [f"Objet : {requirements.resume}", "CONTEXTE :", *(context or ["(aucun)"])]
@@ -79,10 +80,11 @@ def build_draft_messages(
     decision: str,
     comment: str = "",
     lessons: list[str] | None = None,
+    lots: list[str] | None = None,
 ) -> list[dict[str, str]]:
     checks_block = "\n".join(f"- {c['name']} : {c['status']} ({c['detail']})" for c in checks)
     user = (
-        f"AVIS : {title}\n\nEXIGENCES VÉRIFIÉES :\n{_requirements_block(requirements)}\n\n"
+        f"AVIS : {title}\n\nEXIGENCES VÉRIFIÉES :\n{_requirements_block(requirements, lots)}\n\n"
         f"PROFIL DE L'ENTREPRISE :\n{_profile_block(profile)}\n\n"
         f"CONTRÔLES :\n{checks_block}\n\nDÉCISION VALIDÉE : {decision}"
     )
@@ -109,20 +111,29 @@ def claims_part(draft: str) -> str:
     return _TO_COMPLETE_SPAN.sub("", head)
 
 
-def draft_sources(requirements: Requirements, profile: CompanyProfile) -> list[RetrievedChunk]:
-    """Ce que le rédacteur avait le droit d'utiliser : les exigences et le profil."""
+def draft_sources(
+    requirements: Requirements, profile: CompanyProfile, lots: list[str] | None = None
+) -> list[RetrievedChunk]:
+    """Ce que le rédacteur avait le droit d'utiliser : les exigences, les lots et le profil."""
+    block = _requirements_block(requirements, lots)
     return [
-        RetrievedChunk("avis", 0, _requirements_block(requirements), 1.0, "Exigences de l'avis"),
+        RetrievedChunk("avis", 0, block, 1.0, "Exigences de l'avis"),
         RetrievedChunk("profil", 0, _profile_block(profile), 1.0, "Profil de l'entreprise"),
     ]
 
 
-def check_draft(llm, draft: str, requirements: Requirements, profile: CompanyProfile) -> dict:
+def check_draft(
+    llm,
+    draft: str,
+    requirements: Requirements,
+    profile: CompanyProfile,
+    lots: list[str] | None = None,
+) -> dict:
     """Fidélité du brouillon : part des affirmations soutenues par l'avis ou le profil."""
     from tenderpilot.evaluation.judge import judge_answer
 
     verdict = judge_answer(
-        llm, "Note de candidature", claims_part(draft), draft_sources(requirements, profile)
+        llm, "Note de candidature", claims_part(draft), draft_sources(requirements, profile, lots)
     )
     return {"faithfulness": verdict.faithfulness, "unsupported": verdict.unsupported}
 

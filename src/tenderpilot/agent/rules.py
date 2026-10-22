@@ -165,6 +165,15 @@ def check_certifications(requirements: Requirements, profile: CompanyProfile) ->
     return Check("certifications", "ok", "Toutes les certifications exigées sont détenues")
 
 
+def check_correction(notice: dict) -> Check:
+    """Un avis rectifié n'empêche pas de répondre, mais la PME doit relire ce qui a changé."""
+    changes = notice.get("modifications", [])
+    if notice.get("rectificatif") or changes:
+        detail = "Avis rectifié : " + ("; ".join(changes[:3]) if changes else "voir l'avis")
+        return Check("rectificatif", "a_verifier", detail)
+    return Check("rectificatif", "ok", "Avis initial, non rectifié")
+
+
 def qualify(
     notice: dict, requirements: Requirements, profile: CompanyProfile, today: date
 ) -> tuple[str, list[Check]]:
@@ -175,6 +184,7 @@ def qualify(
         check_deadline(deadline_date(notice.get("deadline")), profile, today),
         check_turnover(requirements, profile),
         check_certifications(requirements, profile),
+        check_correction(notice),
     ]
     if any(c.status == "ko" and c.blocking for c in checks):
         return NO_GO, checks

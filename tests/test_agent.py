@@ -216,3 +216,12 @@ def test_contexte_separe_des_exigences_a_traiter():
     assert "48 mois" in context and "48 mois" not in to_answer
     assert "Prix 40 %" in to_answer
     assert "(aucune)" in _requirements_block(_req(duree=verified("12 mois")))
+
+
+def test_avis_rectifie_a_verifier_sans_changer_la_decision(notice, profile):
+    notice["rectificatif"] = True
+    notice["modifications"] = ["La date limite a été reportée au 09/11/26"]
+    decision, checks = qualify(notice, _req(chiffre_affaires_min=verified("1 €")), profile, TODAY)
+    check = next(c for c in checks if c.name == "rectificatif")
+    assert check.status == "a_verifier" and "reportée" in check.detail
+    assert decision == GO
