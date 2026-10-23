@@ -15,6 +15,7 @@ qu'un premier rang dans un seul classement écrase tout le reste.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import replace
 from typing import Protocol
 
@@ -28,8 +29,12 @@ RRF_K = 60
 
 
 class SearchableStore(Protocol):
-    def search(self, query_vector: np.ndarray, k: int = 5) -> list[RetrievedChunk]: ...
-    def search_fulltext(self, query: str, k: int = 5) -> list[RetrievedChunk]: ...
+    def search(
+        self, query_vector: np.ndarray, k: int = 5, departements: Sequence[str] | None = None
+    ) -> list[RetrievedChunk]: ...
+    def search_fulltext(
+        self, query: str, k: int = 5, departements: Sequence[str] | None = None
+    ) -> list[RetrievedChunk]: ...
 
 
 def rrf_fuse(rankings: list[list[RetrievedChunk]], rrf_k: int = RRF_K) -> list[RetrievedChunk]:
@@ -52,15 +57,22 @@ def retrieve(
     k: int = 5,
     mode: str = "vector",
     candidates: int = 30,
+    departements: Sequence[str] | None = None,
 ) -> list[RetrievedChunk]:
-    """Les k morceaux les plus pertinents pour la question, selon le mode choisi."""
+    """Les k morceaux les plus pertinents pour la question, selon le mode choisi.
+
+    `departements` : ne garder que les avis de ces départements. Le filtre est appliqué
+    PENDANT la recherche (dans la base), pas après : sinon, sur 30 candidats, il pourrait
+    n'en rester aucun du bon département.
+    """
     if mode not in MODES:
         raise ValueError(f"Mode de recherche inconnu : {mode!r} (choix : {', '.join(MODES)})")
     if mode == "text":
-        return store.search_fulltext(question, k=k)
+        return store.search_fulltext(question, k=k, departements=departements)
     n_vector = k if mode == "vector" else candidates
-    vector_hits = store.search(embedder.embed([question])[0], k=n_vector)
+    query_vector = embedder.embed([question])[0]
+    vector_hits = store.search(query_vector, k=n_vector, departements=departements)
     if mode == "vector":
         return vector_hits
-    text_hits = store.search_fulltext(question, k=candidates)
+    text_hits = store.search_fulltext(question, k=candidates, departements=departements)
     return rrf_fuse([vector_hits, text_hits])[:k]

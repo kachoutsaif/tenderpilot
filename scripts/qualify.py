@@ -3,6 +3,7 @@
     python scripts/qualify.py 26-98519
     python scripts/qualify.py 26-98519 --profile profiles/exemple_proprete.toml
     python scripts/qualify.py 26-98519 --yes      # accepte la décision des règles sans demander
+    python scripts/qualify.py 26-98519 --lot 2    # brouillon pour le lot 2 seulement
 
 Étapes : charger l'avis -> extraire les exigences (LLM, preuves vérifiées) -> qualifier
 (règles) -> VOUS validez -> rédiger un brouillon (LLM), vérifié automatiquement par un
@@ -25,6 +26,7 @@ from tenderpilot.agent.report import (
     requirements_lines,
     to_markdown,
 )
+from tenderpilot.agent.structure import find_lot
 from tenderpilot.config import get_settings
 from tenderpilot.rag.llm import OpenAICompatibleLLM
 from tenderpilot.store import PgVectorStore
@@ -61,6 +63,7 @@ def main() -> None:
     parser.add_argument("notice_id")
     parser.add_argument("--profile", default="profiles/exemple_proprete.toml")
     parser.add_argument("--yes", action="store_true", help="valide la décision sans demander")
+    parser.add_argument("--lot", help="numéro du lot visé (par défaut : tous les lots)")
     parser.add_argument(
         "--memory",
         choices=["learn", "use", "off"],
@@ -98,6 +101,13 @@ def main() -> None:
             review = {"decision": payload["decision"], "comment": ""}
         else:
             review = ask_human(payload, state)
+        if args.lot:
+            lots = state["notice"].get("lots", [])
+            if find_lot(lots, args.lot) is None:
+                store.close()
+                numbers = ", ".join(x["numero"] for x in lots) or "aucun"
+                raise SystemExit(f"Lot {args.lot!r} introuvable (lots de l'avis : {numbers})")
+            review["lot"] = args.lot
         print("Rédaction..." if review["decision"] != "NO_GO" else "Arrêt : NO-GO confirmé.")
         state = agent.invoke(Command(resume=review), config)
 

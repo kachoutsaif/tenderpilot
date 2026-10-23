@@ -53,11 +53,27 @@ ALTER TABLE chunks ADD COLUMN IF NOT EXISTS tsv tsvector
 CREATE INDEX IF NOT EXISTS chunks_tsv_gin ON chunks USING gin (tsv);
 """
 
+# Filtre facultatif par département, appliqué dans la requête SQL (filtrage par métadonnées).
+# Le champ BOAMP « code_departement » est tantôt une liste, tantôt une valeur seule.
+# %(deps)s vaut NULL quand aucun filtre n'est demandé : la condition est alors toujours vraie.
+DEPARTMENT_FILTER = """
+(%(deps)s::text[] IS NULL OR EXISTS (
+    SELECT 1
+    FROM jsonb_array_elements_text(
+        CASE jsonb_typeof(n.raw -> 'code_departement')
+            WHEN 'array' THEN n.raw -> 'code_departement'
+            ELSE jsonb_build_array(n.raw ->> 'code_departement')
+        END
+    ) AS d(code)
+    WHERE d.code = ANY(%(deps)s::text[])
+))
+"""
+
 # Score plein texte d'un morceau = somme des IDF des mots de la question qu'il contient.
 # IDF (formule de BM25) : un mot présent partout (« marché ») ne compte presque pas,
 # un mot rare (« traiteur ») compte beaucoup. Les mots sont reliés par OU : un morceau
 # n'a pas besoin de contenir tous les mots de la question.
-FULLTEXT_SQL = """
+FULLTEXT_SQL = f"""
 WITH terms AS (
     SELECT DISTINCT lex
     FROM unnest(tsvector_to_array(to_tsvector('fr_unaccent', %(q)s))) AS lex
@@ -79,6 +95,7 @@ SELECT c.notice_id, c.chunk_index, c.content, sum(w.idf) AS score, n.title, n.ur
 FROM weighted w
 JOIN chunks c ON c.tsv @@ w.tq
 JOIN notices n ON n.id = c.notice_id
+WHERE {DEPARTMENT_FILTER}
 GROUP BY c.id, n.id
 ORDER BY score DESC, c.id
 LIMIT %(k)s
@@ -94,6 +111,13 @@ class PgVectorStore:
         self.conn = psycopg.connect(database_url, autocommit=True)
         self.conn.execute("CREATE EXTENSION IF NOT EXISTS vector")
         register_vector(self.conn)
+        # Avec un filtre (WHERE), l'index HNSW lit ~40 candidats PUIS filtre : il peut rendre
+        # moins de k résultats. Le parcours itératif (pgvector >= 0.8) continue jusqu'à en
+        # trouver k.
+        try:
+            self.conn.execute("SET hnsw.iterative_scan = strict_order")
+        except psycopg.Error:
+            pass  # pgvector < 0.8 : réglage inconnu, la recherche filtrée reste correcte
 
     def init_schema(self) -> None:
         self.conn.execute(SCHEMA_SQL.format(dim=int(self.dim)))
@@ -152,23 +176,33 @@ class PgVectorStore:
         cur = self.conn.execute("DELETE FROM notices WHERE id = ANY(%s)", (list(notice_ids),))
         return cur.rowcount
 
-    def search(self, query_vector: np.ndarray, k: int = 5) -> list[RetrievedChunk]:
-        """Les k morceaux les plus proches (similarité cosinus)."""
+    def search(
+        self, query_vector: np.ndarray, k: int = 5, departements: Sequence[str] | None = None
+    ) -> list[RetrievedChunk]:
+        """Les k morceaux les plus proches (similarité cosinus), filtrés par département."""
         rows = self.conn.execute(
-            """
+            f"""
             SELECT c.notice_id, c.chunk_index, c.content,
                    1 - (c.embedding <=> %(q)s) AS score, n.title, n.url
             FROM chunks c JOIN notices n ON n.id = c.notice_id
+            WHERE {DEPARTMENT_FILTER}
             ORDER BY c.embedding <=> %(q)s
             LIMIT %(k)s
             """,
-            {"q": np.asarray(query_vector, dtype=np.float32), "k": k},
+            {
+                "q": np.asarray(query_vector, dtype=np.float32),
+                "k": k,
+                "deps": list(departements) if departements else None,
+            },
         ).fetchall()
         return [_to_chunk(r) for r in rows]
 
-    def search_fulltext(self, query: str, k: int = 5) -> list[RetrievedChunk]:
+    def search_fulltext(
+        self, query: str, k: int = 5, departements: Sequence[str] | None = None
+    ) -> list[RetrievedChunk]:
         """Les k morceaux qui contiennent le plus de mots rares de la question."""
-        rows = self.conn.execute(FULLTEXT_SQL, {"q": query, "k": k}).fetchall()
+        params = {"q": query, "k": k, "deps": list(departements) if departements else None}
+        rows = self.conn.execute(FULLTEXT_SQL, params).fetchall()
         return [_to_chunk(r) for r in rows]
 
     def search_text(self, words: list[str], limit: int = 30) -> list[dict]:

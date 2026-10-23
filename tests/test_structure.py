@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from tenderpilot.agent.graph import notice_to_dict
-from tenderpilot.agent.structure import lot_lines, parse_lots, parse_modifications
+from tenderpilot.agent.structure import find_lot, lot_lines, parse_lots, parse_modifications
 from tenderpilot.ingestion.boamp import record_to_notice
 
 FIXTURE = Path(__file__).parent / "fixtures" / "boamp_eforms_real.json"
@@ -55,3 +55,11 @@ def test_fixture_reelle_nevers():
 def test_avis_sans_lot():
     assert parse_lots("Objet : X\n\nConditions du marché\nDurée : 12 mois") == []
     assert parse_modifications("Objet : X") == []
+
+
+def test_trouver_un_lot_quelle_que_soit_l_ecriture():
+    lots = parse_lots(MAUBEUGE)
+    assert find_lot(lots, "2")["titre"].endswith("Maison Sport-Santé")
+    assert find_lot(lots, "Lot 1")["numero"] == "1"
+    assert find_lot(lots, "lot 01")["numero"] == "1"
+    assert find_lot(lots, "3") is None

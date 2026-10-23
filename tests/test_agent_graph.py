@@ -13,6 +13,7 @@ from tenderpilot.agent.graph import build_agent  # noqa: E402
 from tenderpilot.agent.memory import HUMAN, InMemoryLessonStore, Lesson  # noqa: E402
 from tenderpilot.agent.profile import CompanyProfile  # noqa: E402
 from tenderpilot.ingestion.boamp import record_to_notice  # noqa: E402
+from tenderpilot.models import Notice  # noqa: E402
 
 EXTRACTION = json.dumps(
     {
@@ -157,3 +158,31 @@ def test_memoire_en_lecture_seule(sample_records):
     assert state["lessons_used"] == ["Ne pas inventer de fréquence."]
     assert state["lessons_learned"] == [] and len(llm.calls) == 5  # pas d'appel de réflexion
     assert len(lessons.all()) == 1
+
+
+LOTS_TEXT = """Objet : Nettoyage des locaux
+
+Lot 1 : Nettoyage du centre technique municipal
+Durée : 48 mois
+
+Lot 2 : Nettoyage du Centre multi-accueil
+Durée : 48 mois"""
+
+
+def test_brouillon_limite_a_un_lot():
+    store = NoticeStore([])
+    store.notices["LOTS"] = Notice(id="LOTS", title="Nettoyage des locaux", text=LOTS_TEXT)
+    profile = CompanyProfile(nom="Test", activites=["nettoyage"])
+    judge = '{"claims": [{"claim": "Lot 2", "supported": true}]}'
+    llm = SequenceLLM('{"resume": "Nettoyage"}', "brouillon", judge)
+    agent = build_agent(store, llm, profile, today=date(2026, 10, 20))
+    config = {"configurable": {"thread_id": "t7"}}
+    agent.invoke({"notice_id": "LOTS"}, config)
+    state = agent.invoke(Command(resume={"decision": "GO", "lot": "Lot 2"}), config)
+
+    assert state["review"]["lot"] == "Lot 2"
+    draft_prompt = llm.calls[1][1]["content"]
+    assert "PÉRIMÈTRE : La réponse porte UNIQUEMENT sur le Lot 2" in draft_prompt
+    assert "Centre multi-accueil" in draft_prompt
+    assert "centre technique" not in draft_prompt  # l'autre lot n'est plus transmis
+    assert "centre technique" not in llm.calls[2][1]["content"]  # ni au juge

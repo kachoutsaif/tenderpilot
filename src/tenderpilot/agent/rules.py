@@ -49,6 +49,28 @@ def notice_departments(raw: dict) -> list[str]:
     return [str(v).strip() for v in values if str(v).strip()]
 
 
+_DEPARTMENT = re.compile(r"^(\d{2}|2[AB]|97\d)$")
+
+
+def parse_departments(values: list[str] | str) -> list[str]:
+    """Codes de département saisis par un humain ou un LLM -> codes BOAMP.
+
+    '59' -> '59' ; '1' -> '01' ; '2a' -> '2A'. ValueError si un code n'en est pas un
+    (« Nord » par exemple) : mieux vaut une erreur claire qu'un filtre qui ne trouve rien.
+    """
+    items = [values] if isinstance(values, str) else list(values)
+    codes = []
+    for value in items:
+        code = str(value).strip().upper()
+        code = code.zfill(2) if code.isdigit() and len(code) == 1 else code
+        if not _DEPARTMENT.match(code):
+            raise ValueError(
+                f"Département invalide : {value!r}. Donnez le code (ex. « 59 » pour le Nord)."
+            )
+        codes.append(code)
+    return list(dict.fromkeys(codes))  # sans doublon, ordre conservé
+
+
 def deadline_date(value: str | None) -> date | None:
     """Date limite en heure de Paris, depuis le format ISO de l'API.
 

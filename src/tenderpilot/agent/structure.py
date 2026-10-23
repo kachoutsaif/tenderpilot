@@ -57,3 +57,13 @@ def lot_lines(lots: list[dict[str, str]]) -> list[str]:
         suffix = f" ({', '.join(details)})" if details else ""
         lines.append(f"Lot {lot['numero']} : {lot['titre']}{suffix}")
     return lines
+
+
+def find_lot(lots: list[dict[str, str]], wanted: str) -> dict[str, str] | None:
+    """Le lot demandé : « 1 », « Lot 1 », « lot 01 » désignent tous le lot numéro 1."""
+
+    def key(value: str) -> str:
+        value = re.sub(r"(?i)^\s*lot\s*", "", str(value)).strip()
+        return value.lstrip("0") or "0" if value.isdigit() else value.upper()
+
+    return next((lot for lot in lots if key(lot["numero"]) == key(wanted)), None)

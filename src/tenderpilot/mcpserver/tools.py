@@ -21,8 +21,8 @@ from tenderpilot.agent.extraction import Requirements, extract_requirements
 from tenderpilot.agent.graph import build_agent, notice_to_dict, parse_review
 from tenderpilot.agent.memory import HUMAN, LessonStore
 from tenderpilot.agent.profile import CompanyProfile
-from tenderpilot.agent.rules import NO_GO, PARIS, qualify
-from tenderpilot.agent.structure import lot_lines
+from tenderpilot.agent.rules import NO_GO, PARIS, parse_departments, qualify
+from tenderpilot.agent.structure import find_lot, lot_lines, parse_lots
 from tenderpilot.rag.retrieval import retrieve
 
 MAX_TEXT_CHARS = 8_000  # un avis complet peut être long : on borne ce qu'on renvoie au client
@@ -64,8 +64,21 @@ class TenderTools:
 
     # --- Lecture (aucun appel LLM) ---
 
-    def rechercher_avis(self, question: str, k: int = 5) -> list[dict[str, Any]]:
-        chunks = retrieve(question, self.embedder, self.store, k=k * 3, mode=self.retrieval_mode)
+    def rechercher_avis(
+        self, question: str, k: int = 5, departements: list[str] | None = None
+    ) -> list[dict[str, Any]] | dict[str, Any]:
+        try:
+            codes = parse_departments(departements) if departements else None
+        except ValueError as exc:
+            return {"erreur": str(exc)}
+        chunks = retrieve(
+            question,
+            self.embedder,
+            self.store,
+            k=k * 3,
+            mode=self.retrieval_mode,
+            departements=codes,
+        )
         results: dict[str, dict[str, Any]] = {}
         for c in chunks:  # plusieurs morceaux d'un même avis : on garde le mieux classé
             if c.notice_id not in results:
@@ -146,11 +159,20 @@ class TenderTools:
     # --- Action (appels LLM) : seulement après accord humain ---
 
     def rediger_brouillon(
-        self, notice_id: str, decision_validee: str, commentaire: str = ""
+        self,
+        notice_id: str,
+        decision_validee: str,
+        commentaire: str = "",
+        lot: str | None = None,
     ) -> dict[str, Any]:
         review = parse_review({"decision": decision_validee, "comment": commentaire}, NO_GO)
         if review["decision"] == NO_GO:
             return {"avis": notice_id, "message": "Décision NO-GO : aucun brouillon rédigé."}
+        if lot:  # vérifié AVANT tout appel LLM : une erreur ici ne coûte aucun token
+            error = self._check_lot(notice_id, lot)
+            if error:
+                return {"erreur": error}
+            review["lot"] = lot
         from langgraph.types import Command
 
         agent = build_agent(
@@ -171,7 +193,21 @@ class TenderTools:
         return {
             "avis": notice_id,
             "decision_validee": review["decision"],
+            "lot": review.get("lot", "tous"),
             "fidelite": [round(h["faithfulness"], 2) for h in history],
             "affirmations_non_soutenues_restantes": state["draft_check"]["unsupported"],
             "brouillon": state["draft"],
         }
+
+    def _check_lot(self, notice_id: str, lot: str) -> str:
+        """Message d'erreur si le lot demandé n'existe pas, sinon chaîne vide."""
+        notice = self.store.get_notice(notice_id)
+        if notice is None:
+            return f"Avis {notice_id} introuvable dans la base"
+        lots = parse_lots(notice.text)
+        if not lots:
+            return f"L'avis {notice_id} n'est pas divisé en lots : omettez le paramètre lot."
+        if find_lot(lots, lot) is None:
+            numbers = ", ".join(x["numero"] for x in lots)
+            return f"Lot {lot!r} introuvable dans l'avis {notice_id} (lots : {numbers})"
+        return ""

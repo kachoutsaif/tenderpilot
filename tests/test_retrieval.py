@@ -50,3 +50,14 @@ def test_retrieve_tous_les_modes(filled_store, embedder, mode):
 def test_retrieve_mode_inconnu(filled_store, embedder):
     with pytest.raises(ValueError, match="Mode de recherche inconnu"):
         retrieve("test", embedder, filled_store, mode="bm25")
+
+
+@pytest.mark.parametrize("mode", ["vector", "text", "hybrid"])
+def test_filtre_par_departement(filled_store, embedder, mode):
+    filled_store.notices["TEST-0001"].raw["code_departement"] = ["59"]
+    filled_store.notices["TEST-0002"].raw["code_departement"] = "75"  # parfois une valeur seule
+    question = "maintenance des serveurs informatiques"  # vise TEST-0002, qui est dans le 75
+    nord = retrieve(question, embedder, filled_store, 5, mode, departements=["59"])
+    assert {c.notice_id for c in nord} <= {"TEST-0001"}
+    paris = retrieve(question, embedder, filled_store, 5, mode, departements=["75"])
+    assert paris and {c.notice_id for c in paris} == {"TEST-0002"}

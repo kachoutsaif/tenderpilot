@@ -37,7 +37,7 @@ from tenderpilot.agent.rules import (
     notice_departments,
     qualify,
 )
-from tenderpilot.agent.structure import lot_lines, parse_lots, parse_modifications
+from tenderpilot.agent.structure import find_lot, lot_lines, parse_lots, parse_modifications
 from tenderpilot.models import Notice
 
 
@@ -90,7 +90,7 @@ _ALIASES = {
 
 
 def parse_review(answer: Any, proposed: str) -> dict[str, str]:
-    """Réponse humaine -> {"decision", "comment"[, "lesson"]}. Accepte un dict ou un texte.
+    """Réponse humaine -> {"decision", "comment"[, "lesson", "lot"]}. Accepte un dict ou un texte.
 
     Une réponse vide ou « ok » valide la décision proposée par les règles.
     """
@@ -109,7 +109,25 @@ def parse_review(answer: Any, proposed: str) -> dict[str, str]:
     review = {"decision": _ALIASES[key], "comment": comment}
     if lesson:
         review["lesson"] = lesson  # consigne durable, pas seulement pour ce brouillon
+    lot = str(answer.get("lot") or "").strip() if isinstance(answer, dict) else ""
+    if lot:
+        review["lot"] = lot  # l'humain peut ne répondre qu'à un lot
     return review
+
+
+def selected_lots(state: dict) -> tuple[list[str], str]:
+    """Les lots à transmettre au rédacteur, et le périmètre de la réponse.
+
+    Sans lot choisi : tous les lots, sans périmètre. Avec un lot choisi (validation humaine) :
+    ce lot seulement, et une consigne explicite pour ne pas parler des autres.
+    """
+    lots = state["notice"].get("lots", [])
+    wanted = (state.get("review") or {}).get("lot")
+    lot = find_lot(lots, wanted) if wanted else None
+    if lot is None:
+        return lot_lines(lots), ""
+    line = lot_lines([lot])[0]
+    return [line], f"La réponse porte UNIQUEMENT sur le {line}. Ne traite pas les autres lots."
 
 
 def build_agent(
@@ -168,6 +186,7 @@ def build_agent(
 
     def rediger(state: AgentState) -> dict:
         used = [lesson.text for lesson in lessons.top(max_lessons)] if lessons else []
+        lots, scope = selected_lots(state)
         messages = build_draft_messages(
             state["notice"]["title"],
             Requirements.model_validate(state["requirements"]),
@@ -176,13 +195,15 @@ def build_agent(
             state["review"]["decision"],
             state["review"].get("comment", ""),
             used,
-            lots=lot_lines(state["notice"].get("lots", [])),
+            lots=lots,
+            scope=scope,
         )
         return {"draft": llm.complete(messages), "revisions": 0, "lessons_used": used}
 
     def verifier_brouillon(state: AgentState) -> dict:
         requirements = Requirements.model_validate(state["requirements"])
-        lots = lot_lines(state["notice"].get("lots", []))
+        # le juge ne voit que le lot visé : parler d'un autre lot sera « non soutenu »
+        lots, _ = selected_lots(state)
         check = check_draft(llm, state["draft"], requirements, profile, lots=lots)
         return {"draft_check": check, "draft_history": [check]}
 

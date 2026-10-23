@@ -91,13 +91,17 @@ def tools() -> TenderTools:
 
 
 @mcp.tool(annotations=READ_ONLY)
-def rechercher_avis(question: str, k: int = 5) -> list[dict[str, Any]]:
+def rechercher_avis(
+    question: str, k: int = 5, departements: list[str] | None = None
+) -> list[dict[str, Any]] | dict[str, Any]:
     """Cherche des avis de marchés publics (BOAMP) correspondant à une question en français.
 
     Exemple : « marchés de nettoyage de vitres », « assurance pour une commune ».
+    departements : codes de département pour filtrer, ex. ["59"] pour le Nord, ["59", "62"]
+    pour le Nord et le Pas-de-Calais. Mettez le lieu ici plutôt que dans la question.
     Renvoie au plus k avis : identifiant, titre, extrait, lien. Ne consomme aucun token LLM.
     """
-    return tools().rechercher_avis(question, k)
+    return tools().rechercher_avis(question, k, departements)
 
 
 @mcp.tool(annotations=READ_ONLY)
@@ -121,15 +125,20 @@ def qualifier_avis(avis: str, extraire_exigences: bool = False) -> dict[str, Any
 
 
 @mcp.tool(annotations=WRITES)
-def rediger_brouillon(avis: str, decision_validee: str, commentaire: str = "") -> dict[str, Any]:
+def rediger_brouillon(
+    avis: str, decision_validee: str, commentaire: str = "", lot: str | None = None
+) -> dict[str, Any]:
     """Rédige un brouillon de note de candidature pour un avis.
 
     À n'appeler QU'APRÈS que l'utilisateur a explicitement validé la décision
     (decision_validee = GO ou A_ETUDIER) : c'est la validation humaine de l'agent.
-    commentaire : consignes de l'utilisateur pour ce brouillon. Le brouillon est vérifié
-    automatiquement (fidélité) et corrigé une fois si besoin. Coûteux : 3 à 6 appels LLM.
+    commentaire : consignes de l'utilisateur pour ce brouillon.
+    lot : numéro du lot visé (ex. « 1 ») si l'utilisateur ne répond qu'à un lot ; omis = tous.
+    Le brouillon est vérifié automatiquement (fidélité) et corrigé une fois si besoin.
+    Ne modifiez pas le brouillon renvoyé : présentez-le tel quel, les [À COMPLÉTER] sont
+    à remplir par l'entreprise. Coûteux : 3 à 6 appels LLM.
     """
-    return tools().rediger_brouillon(avis, decision_validee, commentaire)
+    return tools().rediger_brouillon(avis, decision_validee, commentaire, lot)
 
 
 @mcp.tool(annotations=READ_ONLY)

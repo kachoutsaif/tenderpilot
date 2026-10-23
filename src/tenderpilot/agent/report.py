@@ -52,6 +52,8 @@ def to_markdown(state: dict) -> str:
     review = state.get("review")
     if review:
         out += ["", f"## Décision validée par l'humain : {LABELS[review['decision']]}"]
+        if review.get("lot"):
+            out.append(f"Réponse limitée au lot : {review['lot']}")
         if review.get("comment"):
             out.append(f"Commentaire : {review['comment']}")
     if state.get("requirements"):

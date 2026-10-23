@@ -9,6 +9,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from tenderpilot.agent.rules import notice_departments
 from tenderpilot.ingestion.boamp import load_records_from_file
 from tenderpilot.models import RetrievedChunk
 
@@ -50,9 +51,18 @@ class InMemoryStore:
         self.rows = [r for r in self.rows if r[0].notice_id not in removed]
         return len(removed)
 
-    def search(self, query_vector, k=5):
+    def _in_departments(self, notice_id, departements):
+        if not departements:
+            return True
+        return bool(set(notice_departments(self.notices[notice_id].raw)) & set(departements))
+
+    def search(self, query_vector, k=5, departements=None):
         scored = sorted(
-            ((float(np.dot(query_vector, v)), c) for c, v in self.rows),
+            (
+                (float(np.dot(query_vector, v)), c)
+                for c, v in self.rows
+                if self._in_departments(c.notice_id, departements)
+            ),
             key=lambda x: x[0],
             reverse=True,
         )[:k]
@@ -68,11 +78,13 @@ class InMemoryStore:
             for s, c in scored
         ]
 
-    def search_fulltext(self, query, k=5):
+    def search_fulltext(self, query, k=5, departements=None):
         """Version simplifiée : nombre de mots de la question (4 lettres ou plus) présents."""
         words = set(re.findall(r"\w{4,}", query.lower()))
         scored = []
         for c, _ in self.rows:
+            if not self._in_departments(c.notice_id, departements):
+                continue
             score = sum(1 for w in words if w in c.content.lower())
             if score:
                 scored.append((score, c))

@@ -98,3 +98,22 @@ def test_get_notice_reconstruit_l_avis_complet(pg_store, sample_records):
     notice = store.get_notice(original.id)
     assert notice.text == original.text  # pas de répétition due au chevauchement
     assert store.get_notice("INCONNU") is None
+
+
+def test_filtre_par_departement_en_sql(pg_store, sample_records):
+    """Le filtre est appliqué dans la requête, pour les deux formes du champ BOAMP."""
+    store, embedder = pg_store
+    departments = {"TEST-0001": ["59", "62"], "TEST-0002": "75"}  # liste, ou valeur seule
+    for record in sample_records:
+        notice = record_to_notice(record)
+        if notice:
+            notice.raw["code_departement"] = departments.get(notice.id)
+            ingest_notice(notice, embedder, store)
+
+    vector = embedder.embed(["maintenance des serveurs informatiques"])[0]
+    assert {c.notice_id for c in store.search(vector, k=10, departements=["62"])} == {"TEST-0001"}
+    assert {c.notice_id for c in store.search(vector, k=10, departements=["75"])} == {"TEST-0002"}
+    assert len({c.notice_id for c in store.search(vector, k=10)}) == 3  # sans filtre
+    hits = store.search_fulltext("maintenance serveurs", k=5, departements=["59"])
+    assert all(c.notice_id == "TEST-0001" for c in hits)
+    assert store.search_fulltext("maintenance serveurs", k=5, departements=["75"])

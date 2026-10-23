@@ -42,10 +42,10 @@ compatible peut l'utiliser. On passe à **N + M**.
 
 | Outil | Rôle | Lecture seule | Coût LLM |
 |---|---|---|---|
-| `rechercher_avis(question, k)` | recherche hybride dans les avis | oui | 0 |
+| `rechercher_avis(question, k, departements)` | recherche hybride, filtrable par département | oui | 0 |
 | `lire_avis(avis)` | texte complet d'un avis | oui | 0 |
 | `qualifier_avis(avis, extraire_exigences)` | GO / À ÉTUDIER / NO-GO + contrôles | oui | 0 (1 avec extraction, en cache) |
-| `rediger_brouillon(avis, decision_validee, commentaire)` | brouillon vérifié et corrigé | non | 3 à 6 |
+| `rediger_brouillon(avis, decision_validee, commentaire, lot)` | brouillon vérifié et corrigé, pour tout l'avis ou un lot | non | 3 à 6 |
 | `lister_lecons()` | mémoire de leçons | oui | 0 |
 | `ajouter_lecon(texte)` | ajoute une consigne humaine | non | 0 |
 
@@ -133,6 +133,41 @@ npx @modelcontextprotocol/inspector .venv/bin/python -m tenderpilot.mcpserver.se
 être démarrée. Redémarrez Claude Desktop, puis demandez par exemple : « Quels marchés de
 nettoyage de vitres sont ouverts, et lequel convient à notre entreprise ? »
 
+**Pièges rencontrés (23/10) :**
+- Version **Microsoft Store** de Claude Desktop : le fichier n'est pas dans `%APPDATA%\Claude`
+  mais dans `%LOCALAPPDATA%\Packages\Claude_<id>\LocalCache\Roaming\Claude\`.
+- Une seule accolade `}` en trop : le fichier est **ignoré sans message** (« Aucun serveur
+  ajouté »). Toujours valider : `python -m json.tool claude_desktop_config.json`.
+- Claude Desktop réécrit ce fichier (ses préférences) : le modifier **application fermée**.
+- Tester d'abord le pont à la main : `wsl.exe -d Ubuntu --cd ... .venv/bin/python -c "import
+  tenderpilot.mcpserver.server"`. Une erreur y est bien plus lisible que dans Claude Desktop.
+
+## 8. Premier essai réel dans Claude Desktop : ce qu'il a appris
+
+Question : « Quels marchés de nettoyage sont ouverts dans le Nord (59) ? Qualifie-les pour
+notre entreprise. » puis « Je valide le GO. Prépare le brouillon. »
+
+**Ce qui a marché :** Claude a enchaîné seul recherche → qualification → présentation de la
+décision « à valider » → **attente de l'accord** → rédaction. Lots, rectificatif et points
+« à vérifier » sont arrivés jusqu'à l'utilisateur. Brouillon : fidélité 100 %, valeur
+technique et prix en `[À COMPLÉTER]`, durée de 48 mois dans le contexte seulement (le
+correctif « contexte séparé des exigences » tient).
+
+**Ce que l'essai a révélé, et ce qu'on en a fait :**
+
+| Constat | Correction |
+|---|---|
+| Pas de filtre géographique : 3 recherches, puis tri des avis du 69, 94, 50 par Claude | paramètre `departements` de `rechercher_avis`, filtre appliqué **dans la requête SQL** |
+| Claude propose « un lot ou les deux », l'outil ne savait rédiger que pour tout l'avis | paramètre `lot` de `rediger_brouillon` ; le juge ne voit que ce lot |
+| « ISO 14001 **et Qualipropre** attestent notre démarche environnementale » validé à 100 % | **limite connue** : le juge vérifie les faits, pas les liens entre eux (Qualipropre n'est pas environnemental) |
+| Claude a ajouté un « conseil » (petite enfance) absent des sources | **limite de MCP** : nos garde-fous couvrent ce que nos outils renvoient, pas le texte de l'hôte |
+| Claude propose de rédiger lui-même la méthodologie | consigne dans la description de l'outil : les `[À COMPLÉTER]` sont pour l'entreprise |
+
+**Pourquoi filtrer dans la base et pas après ?** La recherche hybride prend 30 candidats ; si
+on filtrait ensuite, il pourrait n'en rester aucun du Nord. Avec l'index HNSW, le même
+problème existe dans la base (il lit ~40 voisins puis filtre) : le réglage
+`hnsw.iterative_scan` de pgvector 0.8 continue la recherche jusqu'à trouver k résultats.
+
 ## Questions d'entretien
 
 - Quelle différence entre un outil, une ressource et un prompt MCP ? Qui décide de les utiliser ?
@@ -141,3 +176,5 @@ nettoyage de vitres sont ouverts, et lequel convient à notre entreprise ? »
 - Pourquoi ne faut-il jamais écrire sur stdout dans un serveur MCP stdio ?
 - Qu'est-ce qu'une injection de prompt indirecte, et comment votre serveur la limite-t-il ?
 - Graphe LangGraph ou LLM qui choisit ses outils via MCP : quand préférer l'un ou l'autre ?
+- Filtrer par métadonnées avant ou après la recherche vectorielle : quelle différence ?
+- Votre juge a validé une affirmation fausse composée de faits vrais : comment le détecter ?

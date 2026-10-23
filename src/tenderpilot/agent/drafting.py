@@ -81,10 +81,14 @@ def build_draft_messages(
     comment: str = "",
     lessons: list[str] | None = None,
     lots: list[str] | None = None,
+    scope: str = "",
 ) -> list[dict[str, str]]:
     checks_block = "\n".join(f"- {c['name']} : {c['status']} ({c['detail']})" for c in checks)
-    user = (
-        f"AVIS : {title}\n\nEXIGENCES VÉRIFIÉES :\n{_requirements_block(requirements, lots)}\n\n"
+    user = f"AVIS : {title}\n"
+    if scope:
+        user += f"PÉRIMÈTRE : {scope}\n"
+    user += (
+        f"\nEXIGENCES VÉRIFIÉES :\n{_requirements_block(requirements, lots)}\n\n"
         f"PROFIL DE L'ENTREPRISE :\n{_profile_block(profile)}\n\n"
         f"CONTRÔLES :\n{checks_block}\n\nDÉCISION VALIDÉE : {decision}"
     )

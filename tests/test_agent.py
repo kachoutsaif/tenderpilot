@@ -17,7 +17,15 @@ from tenderpilot.agent.extraction import (
 )
 from tenderpilot.agent.graph import notice_to_dict, parse_review
 from tenderpilot.agent.profile import CompanyProfile, load_profile
-from tenderpilot.agent.rules import GO, NO_GO, TO_STUDY, deadline_date, parse_amount, qualify
+from tenderpilot.agent.rules import (
+    GO,
+    NO_GO,
+    TO_STUDY,
+    deadline_date,
+    parse_amount,
+    parse_departments,
+    qualify,
+)
 from tenderpilot.ingestion.boamp import record_to_notice
 
 from .conftest import FakeLLM
@@ -225,3 +233,11 @@ def test_avis_rectifie_a_verifier_sans_changer_la_decision(notice, profile):
     check = next(c for c in checks if c.name == "rectificatif")
     assert check.status == "a_verifier" and "reportée" in check.detail
     assert decision == GO
+
+
+def test_codes_de_departement():
+    codes = parse_departments(["59", " 62", "1", "2a", "974", "59"])
+    assert codes == ["59", "62", "01", "2A", "974"]  # normalisés, sans doublon
+    assert parse_departments("75") == ["75"]
+    with pytest.raises(ValueError, match="code"):
+        parse_departments(["Nord"])  # un nom au lieu d'un code : erreur claire

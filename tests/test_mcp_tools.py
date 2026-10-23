@@ -87,8 +87,10 @@ def test_serveur_expose_les_outils():
 
     from tenderpilot.mcpserver.server import mcp
 
-    names = {tool.name for tool in asyncio.run(mcp.list_tools())}
-    assert names == {
+    listed = {tool.name: tool for tool in asyncio.run(mcp.list_tools())}
+    assert "departements" in listed["rechercher_avis"].input_schema["properties"]
+    assert "lot" in listed["rediger_brouillon"].input_schema["properties"]
+    assert set(listed) == {
         "rechercher_avis",
         "lire_avis",
         "qualifier_avis",
@@ -108,3 +110,20 @@ def test_appel_d_outil_a_travers_le_protocole(tools, monkeypatch):
     monkeypatch.setattr(server, "tools", lambda: tools)
     result = asyncio.run(server.mcp.call_tool("qualifier_avis", {"avis": "TEST-0002"}))
     assert "NO_GO" in str(result)
+
+
+def test_rechercher_avis_par_departement(tools):
+    tools.store.notices["TEST-0001"].raw["code_departement"] = ["59"]
+    results = tools.rechercher_avis("nettoyage des locaux", departements=["59"])
+    assert [r["avis"] for r in results] == ["TEST-0001"]
+    assert tools.rechercher_avis("nettoyage", departements=["62"]) == []
+
+
+def test_rechercher_avis_departement_invalide(tools):
+    assert "59" in tools.rechercher_avis("nettoyage", departements=["Nord"])["erreur"]
+
+
+def test_brouillon_lot_inexistant_sans_appel_llm(tools):
+    result = tools.rediger_brouillon("TEST-0001", "GO", lot="2")
+    assert "pas divisé en lots" in result["erreur"]
+    assert tools.fake_llm.last_messages is None  # erreur détectée avant toute dépense
