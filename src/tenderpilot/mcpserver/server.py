@@ -25,6 +25,7 @@ from mcp.server.mcpserver import MCPServer
 from mcp.types import ToolAnnotations
 
 from tenderpilot.mcpserver.tools import TenderTools
+from tenderpilot.mcpserver.tracing import traced
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_PROFILE = PROJECT_ROOT / "profiles" / "exemple_proprete.toml"
@@ -88,9 +89,12 @@ def tools() -> TenderTools:
 
 
 # --- Outils : ce que l'assistant peut FAIRE ---
+# @traced (sous @mcp.tool) écrit une ligne JSON par appel sur stderr : outil, paramètres,
+# durée, statut. Dans Claude Desktop, ces lignes arrivent dans mcp-server-tenderpilot.log.
 
 
 @mcp.tool(annotations=READ_ONLY)
+@traced
 def rechercher_avis(
     question: str, k: int = 5, departements: list[str] | None = None
 ) -> list[dict[str, Any]] | dict[str, Any]:
@@ -99,18 +103,21 @@ def rechercher_avis(
     Exemple : « marchés de nettoyage de vitres », « assurance pour une commune ».
     departements : codes de département pour filtrer, ex. ["59"] pour le Nord, ["59", "62"]
     pour le Nord et le Pas-de-Calais. Mettez le lieu ici plutôt que dans la question.
-    Renvoie au plus k avis : identifiant, titre, extrait, lien. Ne consomme aucun token LLM.
+    Renvoie au plus k avis (10 au maximum) : identifiant, titre, extrait, lien.
+    Ne consomme aucun token LLM.
     """
     return tools().rechercher_avis(question, k, departements)
 
 
 @mcp.tool(annotations=READ_ONLY)
+@traced
 def lire_avis(avis: str) -> dict[str, Any]:
     """Renvoie le texte complet d'un avis à partir de son identifiant (ex. « 26-98519 »)."""
     return tools().lire_avis(avis)
 
 
 @mcp.tool(annotations=READ_ONLY)
+@traced
 def qualifier_avis(avis: str, extraire_exigences: bool = False) -> dict[str, Any]:
     """Propose une décision GO / A_ETUDIER / NO_GO pour l'entreprise, avec le détail des contrôles.
 
@@ -125,6 +132,7 @@ def qualifier_avis(avis: str, extraire_exigences: bool = False) -> dict[str, Any
 
 
 @mcp.tool(annotations=WRITES)
+@traced
 def rediger_brouillon(
     avis: str, decision_validee: str, commentaire: str = "", lot: str | None = None
 ) -> dict[str, Any]:
@@ -142,12 +150,14 @@ def rediger_brouillon(
 
 
 @mcp.tool(annotations=READ_ONLY)
+@traced
 def lister_lecons() -> list[dict[str, Any]]:
     """Liste la mémoire de leçons : les consignes injectées dans chaque brouillon."""
     return tools().lister_lecons()
 
 
 @mcp.tool(annotations=WRITES)
+@traced
 def ajouter_lecon(texte: str) -> dict[str, Any]:
     """Ajoute une consigne durable pour tous les futurs brouillons, à la demande de l'utilisateur.
 
