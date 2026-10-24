@@ -6,7 +6,7 @@ est bloquée avant d'arriver sur `main`.
 | Étape | Contenu | État |
 |---|---|---|
 | 1 | Traçage des appels d'outils MCP | fait |
-| 2 | Évaluation de la recherche dans la CI, sans LLM (hit@k, MRR) | à faire |
+| 2 | Évaluation de la recherche dans la CI, sans LLM (hit@k, MRR) | fait |
 | 3 | Porte qualité : la CI échoue si le score passe sous un seuil | à faire |
 | 4 | Évaluation complète avec LLM, à la main ou une fois par semaine | à faire |
 | 5 | Branches et pull requests, porte qualité obligatoire | à faire |
@@ -62,3 +62,47 @@ grep '"appel_outil"' "$LOG" | sed 's/^[^{]*//' | jq -c '{outil, parametres, dure
   Correction : `k` est borné à 10 (`MAX_RESULTS`), comme le texte renvoyé par `lire_avis`.
 - Le coût du démarrage à froid (3 s) est visible : sur AWS (semaine 5), il faudra charger le
   modèle au démarrage du service, pas au premier appel d'un utilisateur.
+
+## Étape 2 : évaluer la recherche dans la CI, sans LLM
+
+**Corpus figé** (`eval/corpus.jsonl`, `scripts/export_corpus.py`) : les 40 avis attendus par
+les questions + 200 avis « bruit » choisis de façon déterministe (tri par md5 de
+l'identifiant). Texte produit par notre lecteur, courriels et téléphones masqués (96 avis
+sur 240 concernés : notre lecteur les laissait dans le texte libre, découvert en auditant le
+fichier avant publication).
+
+**Évaluation** (`scripts/evaluate_ci.py`) : base vidée → corpus chargé avec le vrai modèle
+d'embedding → 30 questions → hit@5, recall@5, MRR → tableau Markdown dans la page de la CI
+(`$GITHUB_STEP_SUMMARY`) et JSON détaillé en artefact.
+
+Pourquoi sans LLM ? Gratuit (pas de quota Groq), rapide, et surtout **reproductible** :
+même code + même corpus = même score. Une porte qualité qui varie au hasard bloquerait des
+modifications sans raison.
+
+Garde-fou : le script vide la base indiquée, donc il refuse toute base dont le nom ne finit
+pas par `_test` ou `_eval`.
+
+En local :
+
+```bash
+docker compose exec db createdb -U tender tenderpilot_eval      # une seule fois
+EVAL_DATABASE_URL=postgresql://tender:tender@localhost:5432/tenderpilot_eval \
+    python scripts/evaluate_ci.py
+```
+
+**Score du corpus et score de la base locale ne sont pas égaux (24/10) :**
+
+| | Avis | hit@5 | recall@5 | MRR |
+|---|---|---|---|---|
+| base locale | 300 | 0,962 | 0,866 | 0,779 |
+| corpus figé | 240 | 0,923 | 0,846 | 0,788 |
+
+Enquête : 24 questions sur 30 ont des résultats différents, mais une seule change de verdict
+(q15). Comparaison avis par avis (nombre de morceaux et de caractères) : 96 avis diffèrent,
+**tous à cause du masquage**, aucun pour une autre raison. Causes de l'écart : le masquage
+modifie le texte (donc les vecteurs) de 40 % des avis, et retirer 60 avis change la rareté
+des mots (IDF) du score plein texte.
+
+Conséquence : la porte qualité compare un corpus **à lui-même** (avant / après une
+modification) ; sa référence est donc le score du corpus, pas celui de la base locale.
+Leçon : un score n'a de sens qu'avec la version exacte des données qui l'ont produit.

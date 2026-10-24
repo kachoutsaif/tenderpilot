@@ -45,3 +45,25 @@ jobs:
 
       - name: Tests (unitaires + intégration pgvector)
         run: pytest -v
+
+      # --- Évaluation de la recherche (semaine 4) : sans LLM, donc gratuite et reproductible ---
+      - name: Cache du modèle d'embedding
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/fastembed
+          key: fastembed-${{ hashFiles('src/tenderpilot/rag/embeddings.py') }}
+
+      - name: Évaluation de la recherche (corpus figé)
+        env:
+          # base vidée par le script : nom en _test obligatoire (garde-fou du script)
+          EVAL_DATABASE_URL: postgresql://test:test@localhost:5432/tenderpilot_test
+          EMBEDDING_CACHE_DIR: /home/runner/.cache/fastembed
+        run: python scripts/evaluate_ci.py --summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Conserver les résultats détaillés
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-recherche
+          path: out/evaluation_ci.json
+          if-no-files-found: ignore

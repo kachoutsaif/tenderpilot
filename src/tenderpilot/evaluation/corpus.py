@@ -11,9 +11,10 @@ brut), plus quelques champs utiles. Deux raisons :
   les écarte, et ce fichier sera publié sur GitHub ;
 - il est environ deux fois plus petit (les données eForms brutes sont verbeuses).
 Masquage : les avis contiennent parfois des courriels et des téléphones dans leur texte
-libre (constaté le 24/10 : 24 avis sur 240). Ils sont remplacés par [courriel] et
-[téléphone] avant l'écriture du fichier. Effet négligeable sur la recherche : personne ne
-cherche un marché par l'adresse électronique de l'acheteur.
+libre (constaté le 24/10 : 96 avis sur 240, surtout des téléphones). Ils sont remplacés
+par [courriel] et [téléphone] avant l'écriture du fichier. Personne ne cherche un marché
+par le téléphone de l'acheteur, mais le texte change, donc les vecteurs aussi : c'est une
+des raisons pour lesquelles le score du corpus diffère un peu de celui de la base locale.
 Conséquence à connaître : une modification du lecteur d'avis (ingestion/) n'est pas
 mesurée par cette évaluation. Il faudra alors régénérer le corpus.
 
