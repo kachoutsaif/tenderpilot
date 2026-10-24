@@ -127,3 +127,19 @@ def test_brouillon_lot_inexistant_sans_appel_llm(tools):
     result = tools.rediger_brouillon("TEST-0001", "GO", lot="2")
     assert "pas divisé en lots" in result["erreur"]
     assert tools.fake_llm.last_messages is None  # erreur détectée avant toute dépense
+
+
+def test_rechercher_avis_borne_k(tools, monkeypatch):
+    from tenderpilot.mcpserver import tools as module
+
+    asked = []
+    real = module.retrieve
+
+    def spy(*args, **kwargs):
+        asked.append(kwargs["k"])
+        return real(*args, **kwargs)
+
+    monkeypatch.setattr(module, "retrieve", spy)
+    tools.rechercher_avis("nettoyage", k=1000)
+    tools.rechercher_avis("nettoyage", k=0)
+    assert asked == [3 * module.MAX_RESULTS, 3]  # ni 3 000 morceaux, ni zéro

@@ -26,6 +26,9 @@ from tenderpilot.agent.structure import find_lot, lot_lines, parse_lots
 from tenderpilot.rag.retrieval import retrieve
 
 MAX_TEXT_CHARS = 8_000  # un avis complet peut être long : on borne ce qu'on renvoie au client
+# Le LLM hôte choisit k lui-même (trace du 24/10 : k=15). Chaque avis renvoyé coûte des tokens
+# à l'hôte et la recherche lit 3 x k morceaux : on borne, comme pour le texte.
+MAX_RESULTS = 10
 
 
 class TenderTools:
@@ -67,6 +70,7 @@ class TenderTools:
     def rechercher_avis(
         self, question: str, k: int = 5, departements: list[str] | None = None
     ) -> list[dict[str, Any]] | dict[str, Any]:
+        k = max(1, min(int(k), MAX_RESULTS))
         try:
             codes = parse_departments(departements) if departements else None
         except ValueError as exc:
