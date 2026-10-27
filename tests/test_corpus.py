@@ -41,7 +41,7 @@ def test_fichier_stable_trie_sans_doublon(sample_records, tmp_path):
 
 def test_masquage_courriels_et_telephones():
     text = (
-        "Contact : jean.dupont@ville-maubeuge.fr ou marches@cc-sambre.fr, "
+        "Écrire à jean.dupont@ville-maubeuge.fr ou marches@cc-sambre.fr, "
         "tél. 03 27 53 75 00, 03.27.53.75.00, 0327537500 ou +33 3 27 53 75 00. "
         "Durée : 48 mois, CPV 90911000, montant 210 000 euros, date 09/11/2026."
     )
@@ -50,3 +50,20 @@ def test_masquage_courriels_et_telephones():
     assert out.count("[téléphone]") == 4
     # ce qui ressemble à des chiffres mais n'est pas un numéro reste intact
     assert "90911000" in out and "210 000 euros" in out and "09/11/2026" in out
+
+
+def test_lignes_de_contact_et_noms_supprimes():
+    text = (
+        "nomOfficiel : Mairie de Raismes\n"
+        "nomContact : Pamela Lescol\n"
+        "telContact : 03 27 00 00 00\n"
+        "capaciteExercice : Déclaration sur l'honneur\n"
+        "Renseignements : Mme TANQUEREL - Tél : 03 27 00 00 01. Monsieur le Maire signe. "
+        "Mme. Alexandra Martin"
+    )
+    out = redact(text)
+    assert "Lescol" not in out and "TANQUEREL" not in out and "Contact" not in out
+    assert "Alexandra" not in out and "Martin" not in out
+    assert "nomOfficiel : Mairie de Raismes\ncapaciteExercice" in out  # le reste est gardé
+    assert "[personne]" in out and "[téléphone]" in out
+    assert "Monsieur le Maire" in out  # une fonction n'est pas un nom de personne

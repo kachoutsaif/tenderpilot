@@ -106,3 +106,13 @@ des mots (IDF) du score plein texte.
 Conséquence : la porte qualité compare un corpus **à lui-même** (avant / après une
 modification) ; sa référence est donc le score du corpus, pas celui de la base locale.
 Leçon : un score n'a de sens qu'avec la version exacte des données qui l'ont produit.
+
+**Données personnelles : deuxième audit (24/10).** En vérifiant ce que masquait la règle
+« téléphone », on a vu les noms juste avant : « nomContact : Pamela L... », « Mme T... -
+Tél ». Notre lecteur recopie un bloc contact (102 lignes `nomContact` dans le corpus), et ce
+corpus était déjà publié sur `main` (PR n° 2). Correction : les lignes de contact sont
+supprimées en entier, les noms après une civilité (M., Mme, Monsieur, Madame) deviennent
+`[personne]`. « Monsieur le Maire » est gardé : une fonction n'est pas un nom.
+Leçon : auditer ce qu'on publie, et ne pas croire une documentation sans la vérifier (la
+nôtre affirmait que le lecteur écartait les contacts). À faire en semaine 5 : appliquer le
+même nettoyage dès l'ingestion, pour que la base elle-même ne stocke pas ces données.
