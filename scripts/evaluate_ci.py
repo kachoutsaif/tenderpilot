@@ -3,7 +3,11 @@
     EVAL_DATABASE_URL=postgresql://.../tenderpilot_eval python scripts/evaluate_ci.py
 
 Étapes : vider la base d'évaluation -> charger eval/corpus.jsonl (découpage + vecteurs)
--> poser les questions -> hit@k, recall@k, MRR -> tableau Markdown et fichier JSON.
+-> poser les questions -> hit@k, recall@k, MRR -> tableau Markdown et fichier JSON
+-> PORTE QUALITÉ : code de sortie 1 (la CI échoue) si un score passe sous la référence
+   (eval/reference.json) moins la tolérance. Voir evaluation/gate.py.
+
+    python scripts/evaluate_ci.py --update-reference --note "pourquoi"   # nouvelle référence
 
 ATTENTION : la base indiquée est VIDÉE. Par sécurité, son nom doit finir par « _test » ou
 « _eval » : impossible d'effacer par erreur la base de développement (« tenderpilot »).
@@ -23,6 +27,13 @@ from urllib.parse import urlparse
 from tenderpilot.config import get_settings
 from tenderpilot.evaluation.corpus import load_corpus
 from tenderpilot.evaluation.dataset import load_questions
+from tenderpilot.evaluation.gate import (
+    DEFAULT_TOLERANCE,
+    check_gate,
+    gate_markdown,
+    load_reference,
+    save_reference,
+)
 from tenderpilot.evaluation.offline import load_into_store, markdown_report
 from tenderpilot.evaluation.runner import run_evaluation, to_dict
 from tenderpilot.rag.embeddings import FastEmbedEmbedder
@@ -49,6 +60,12 @@ def main() -> None:
     parser.add_argument("--mode", default="hybrid", choices=["vector", "text", "hybrid"])
     parser.add_argument("--out", default="out/evaluation_ci.json")  # out/ : ignoré par git
     parser.add_argument("--summary", help="fichier où AJOUTER le rapport Markdown (CI)")
+    parser.add_argument("--reference", default="eval/reference.json")
+    parser.add_argument(
+        "--update-reference", action="store_true", help="enregistre ces scores comme référence"
+    )
+    parser.add_argument("--tolerance", type=float, default=DEFAULT_TOLERANCE)
+    parser.add_argument("--note", default="", help="raison de la mise à jour de la référence")
     args = parser.parse_args()
 
     url = safe_database_url(args.database_url)
@@ -79,6 +96,16 @@ def main() -> None:
         "durée": f"{time.perf_counter() - start:.0f} s",
     }
     report = markdown_report(summary, results, config)
+    passed = True
+    if args.update_reference:
+        save_reference(summary, args.reference, args.tolerance, args.note)
+        report += f"\nRéférence mise à jour : `{args.reference}`\n"
+    elif Path(args.reference).exists():
+        checks = check_gate(summary, load_reference(args.reference))
+        passed = all(c.ok for c in checks)
+        report += gate_markdown(checks, args.k)
+    else:
+        report += f"\nAucune référence ({args.reference}) : porte qualité non appliquée.\n"
     print(report)
     if args.summary:
         with open(args.summary, "a", encoding="utf-8") as f:
@@ -89,6 +116,8 @@ def main() -> None:
     payload = {"config": config, "summary": summary, "results": to_dict(results)}
     out.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"Résultats détaillés : {out}")
+    if not passed:
+        raise SystemExit(1)  # la CI échoue : la pull request ne peut pas être fusionnée
 
 
 if __name__ == "__main__":

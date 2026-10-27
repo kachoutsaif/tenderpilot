@@ -1,0 +1,10 @@
+{
+  "date": "2026-10-27",
+  "tolerance": 0.02,
+  "scores": {
+    "hit@k": 0.962,
+    "recall@k": 0.871,
+    "mrr": 0.821
+  },
+  "note": "Corpus figé de 240 avis (contacts retirés), recherche hybride, k=5. Même score sur le PC et dans la CI."
+}
