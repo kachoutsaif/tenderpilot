@@ -9,7 +9,7 @@ est bloquée avant d'arriver sur `main`.
 | 2 | Évaluation de la recherche dans la CI, sans LLM (hit@k, MRR) | fait |
 | 3 | Porte qualité : la CI échoue si le score passe sous un seuil | fait |
 | 4 | Évaluation complète avec LLM, à la main ou une fois par semaine | à faire |
-| 5 | Branches et pull requests, porte qualité obligatoire | en cours |
+| 5 | Branches et pull requests, porte qualité obligatoire | fait |
 
 ## Étape 1 : traçage des appels d'outils
 
@@ -151,3 +151,31 @@ une décision visible dans le diff, expliquée dans la pull request.
 - Elle mesure la recherche, pas la réponse du LLM (étape 4) ni le lecteur d'avis (le corpus
   est déjà lu ; une modification de `ingestion/` demande de régénérer le corpus).
 - Questions écrites en regardant les avis : biais de sélection (voir semaine 2).
+
+## Preuve : la porte bloque une vraie régression (27/10, PR n° 5)
+
+**Protection de `main`** (GitHub, règles de branche) : pull request obligatoire, check
+`lint-and-test` requis, 0 approbation exigée (projet à une personne : on ne peut pas
+approuver sa propre PR). Effet : une CI rouge grise le bouton de fusion, même pour le
+propriétaire du dépôt.
+
+**Régression volontaire** : la recherche hybride « simplifiée » en recherche vectorielle seule
+(`rrf_fuse([vector_hits])`), sur une branche de test.
+
+| Recherche | hit@5 | recall@5 | MRR | Questions ratées |
+|---|---|---|---|---|
+| hybride (vecteurs + plein texte) | **0,962** | **0,871** | **0,821** | 1 |
+| vecteurs seuls (régression) | 0,692 | 0,618 | 0,574 | 8 |
+| écart | −0,270 | −0,253 | −0,247 | +7 |
+
+Résultat : `❌ Porte qualité : ÉCHEC`, code de sortie 1, CI rouge, fusion bloquée. PR fermée
+sans fusion.
+
+**Ce que le chiffre apprend aussi :** sans le plein texte, on perd 7 questions, et ce sont
+celles qui reposent sur un mot précis : « marquage au sol » (q14), « VRD » et « Val-d'Oise »
+(q15), « traiteur » (q21), « lycée agricole de l'Oise » (q27), « lavage des conteneurs »
+(q10). Exactement la faiblesse des embeddings mesurée en semaine 2 (sigles, noms de lieux,
+mots rares). La recherche hybride apporte **+27 points de hit@5** sur ce corpus.
+
+**Leçon** : une porte qu'on n'a jamais vue se fermer n'est pas une porte testée. On l'a
+fermée volontairement, en local (code de sortie 1) puis sur GitHub (fusion bloquée).
