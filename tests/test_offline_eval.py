@@ -1,9 +1,18 @@
 """Évaluation hors ligne : chargement du corpus, scores, rapport Markdown."""
 
+import pytest
+
 from tenderpilot.evaluation.dataset import EvalQuestion
-from tenderpilot.evaluation.offline import load_into_store, markdown_report
+from tenderpilot.evaluation.offline import (
+    llm_markdown,
+    load_into_store,
+    markdown_report,
+    safe_database_url,
+)
 from tenderpilot.evaluation.runner import run_evaluation
 from tenderpilot.ingestion.boamp import record_to_notice
+
+from .conftest import FakeLLM
 
 QUESTIONS = [
     EvalQuestion("q1", "maintenance des serveurs informatiques", ["TEST-0002"]),
@@ -44,3 +53,32 @@ def test_rapport_markdown(store, embedder, sample_records):
     assert "| **global** | 4 |" in report
     assert "`q3` avis qui n'existe pas — attendu INCONNU" in report  # les ratés sont listés
     assert "`q4`" in report and "rappel 0.50" in report  # les partiels aussi
+
+
+def test_garde_fou_base_d_evaluation():
+    url = "postgresql://u:p@localhost:5432/tenderpilot_eval"
+    assert safe_database_url(url) == url
+    assert safe_database_url("postgresql://u:p@localhost/tenderpilot_test")
+    with pytest.raises(ValueError, match="VIDÉE"):
+        safe_database_url("postgresql://u:p@localhost:5432/tenderpilot")  # base de dév
+    with pytest.raises(ValueError, match="EVAL_DATABASE_URL"):
+        safe_database_url(None)
+
+
+def test_rapport_avec_llm(store, embedder, sample_records):
+    notices = [n for n in map(record_to_notice, sample_records) if n]
+    load_into_store(notices, embedder, store)
+    questions = [
+        EvalQuestion("q1", "maintenance des serveurs informatiques", ["TEST-0002"]),
+        EvalQuestion("h1", "Qui a gagné la coupe du monde ?", [], kind="hors_sujet"),
+    ]
+    answer = FakeLLM("Le marché porte sur la maintenance [1].")  # répond même hors sujet
+    judge = FakeLLM(
+        '{"claims": [{"claim": "maintenance", "supported": true},'
+        ' {"claim": "durée de 3 ans", "supported": false}]}'
+    )
+    results, summary = run_evaluation(questions, embedder, store, k=2, llm=answer, judge=judge)
+    report = llm_markdown(summary, results, {"modèle": "test"})
+    assert "| **global** | 2 | 0.500 | 0.000 |" in report  # fidélité 1/2, hors sujet raté
+    assert "`q1` durée de 3 ans" in report  # l'affirmation non soutenue est listée
+    assert "`h1` Qui a gagné la coupe du monde ?" in report  # le refus manquant aussi
