@@ -1,0 +1,1 @@
+{"date": "2026-10-27T19:49", "modèle": "openai/gpt-oss-120b", "juge": "openai/gpt-oss-20b", "mode": "hybrid", "k": 5, "corpus": "240 avis", "questions": 3, "commit": "ec7cbf5", "durée": "0.9 min", "hit@k": 1.0, "recall@k": 1.0, "mrr": 1.0, "fidelite": 0.944, "hors_sujet_ok": null, "citations_invalides": 0, "erreurs": 0, "latence_moy_s": 1.3, "latence_p95_s": 2.0}

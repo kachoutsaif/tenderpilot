@@ -8,7 +8,7 @@ est bloquée avant d'arriver sur `main`.
 | 1 | Traçage des appels d'outils MCP | fait |
 | 2 | Évaluation de la recherche dans la CI, sans LLM (hit@k, MRR) | fait |
 | 3 | Porte qualité : la CI échoue si le score passe sous un seuil | fait |
-| 4 | Évaluation complète avec LLM, à la main ou une fois par semaine | à faire |
+| 4 | Évaluation complète avec LLM, à la main ou une fois par semaine | fait |
 | 5 | Branches et pull requests, porte qualité obligatoire | fait |
 
 ## Étape 1 : traçage des appels d'outils
@@ -179,3 +179,39 @@ mots rares). La recherche hybride apporte **+27 points de hit@5** sur ce corpus.
 
 **Leçon** : une porte qu'on n'a jamais vue se fermer n'est pas une porte testée. On l'a
 fermée volontairement, en local (code de sortie 1) puis sur GitHub (fusion bloquée).
+
+## Étape 4 : évaluer les réponses, avec LLM (hors des pull requests)
+
+La porte qualité mesure la **recherche**. Elle ne dit rien de la **réponse** :
+- **fidélité** : chaque affirmation est-elle soutenue par les avis cités ? (juge LLM,
+  `gpt-oss-20b`, un autre modèle que celui qui répond, pour limiter l'indulgence envers soi) ;
+- **hors sujet** : pour une question sans réponse dans la base, le système dit-il « je ne
+  trouve pas » ?
+
+`scripts/evaluate_llm.py` : même corpus figé que la porte, puis réponse et jugement pour
+chaque question. Lancé par `.github/workflows/eval-llm.yml` :
+
+| Déclencheur | Quand |
+|---|---|
+| `workflow_dispatch` | à la main : onglet Actions → « Évaluation avec LLM » → Run workflow |
+| `schedule` | chaque lundi à 06:17 UTC |
+
+**Pourquoi pas à chaque pull request, et pourquoi elle ne bloque rien :**
+- coût : ~60 appels, de l'ordre du quota quotidien gratuit de Groq ;
+- variabilité : le LLM ne répond pas deux fois pareil (mesuré en semaine 3). Une porte
+  bloquante fermerait au hasard. Elle **informe** : tendance et réponses à examiner.
+
+| | Porte qualité (recherche) | Évaluation LLM (réponses) |
+|---|---|---|
+| Quand | chaque pull request | à la main, chaque lundi |
+| Coût | 0 (modèle local) | quota Groq |
+| Reproductible | oui, au millième | non |
+| Effet | bloque la fusion | informe |
+
+**Sécurité** : la clé Groq est un **secret chiffré** du dépôt (`LLM_API_KEY`), jamais écrite
+dans le code ni affichée dans les journaux. Le workflow ne tourne pas sur les pull requests :
+le code d'une PR ne peut donc pas lire la clé. La saisie « nombre de questions » passe par une
+variable d'environnement, pas collée dans le script (injection de commande).
+
+**Historique** : chaque lancement ajoute une ligne à `eval/historique_llm.jsonl` (date, commit,
+modèles, scores). Dans la CI, le fichier est conservé 90 jours comme artefact.

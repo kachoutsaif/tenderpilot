@@ -1,0 +1,78 @@
+name: Évaluation avec LLM
+
+# Pas sur les pull requests : ~200 000 tokens par lancement (quota quotidien Groq) et un
+# score qui varie d'un lancement à l'autre. Elle informe, elle ne bloque rien.
+on:
+  workflow_dispatch:        # bouton « Run workflow » dans l'onglet Actions
+    inputs:
+      limit:
+        description: "Nombre de questions (vide = toutes)"
+        required: false
+        default: ""
+  schedule:
+    - cron: "17 6 * * 1"    # chaque lundi, 06:17 UTC
+
+# Une seule évaluation à la fois : deux lancements simultanés épuiseraient le quota.
+concurrency:
+  group: eval-llm
+  cancel-in-progress: false
+
+jobs:
+  evaluation-llm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: tenderpilot_eval
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U test -d tenderpilot_eval"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Installer les dépendances
+        run: pip install -e .
+
+      - name: Cache du modèle d'embedding
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/fastembed
+          key: fastembed-${{ hashFiles('src/tenderpilot/rag/embeddings.py') }}
+
+      - name: Évaluation des réponses (fidélité, hors sujet)
+        env:
+          EVAL_DATABASE_URL: postgresql://test:test@localhost:5432/tenderpilot_eval
+          EMBEDDING_CACHE_DIR: /home/runner/.cache/fastembed
+          # la clé n'est JAMAIS écrite dans le dépôt : secret chiffré du dépôt GitHub
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          JUDGE_MODEL: openai/gpt-oss-20b
+          # passé par une variable, jamais collé dans le script : évite l'injection de commande
+          LIMIT: ${{ github.event.inputs.limit }}
+        run: |
+          python scripts/evaluate_llm.py --summary "$GITHUB_STEP_SUMMARY" ${LIMIT:+--limit $LIMIT}
+
+      - name: Conserver les résultats
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-llm
+          path: |
+            out/evaluation_llm.json
+            eval/historique_llm.jsonl
+          retention-days: 90
+          if-no-files-found: ignore

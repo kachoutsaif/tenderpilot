@@ -22,7 +22,6 @@ import json
 import os
 import time
 from pathlib import Path
-from urllib.parse import urlparse
 
 from tenderpilot.config import get_settings
 from tenderpilot.evaluation.corpus import load_corpus
@@ -34,21 +33,9 @@ from tenderpilot.evaluation.gate import (
     load_reference,
     save_reference,
 )
-from tenderpilot.evaluation.offline import load_into_store, markdown_report
+from tenderpilot.evaluation.offline import markdown_report, prepare_store
 from tenderpilot.evaluation.runner import run_evaluation, to_dict
 from tenderpilot.rag.embeddings import FastEmbedEmbedder
-from tenderpilot.store import PgVectorStore
-
-
-def safe_database_url(url: str | None) -> str:
-    if not url:
-        raise SystemExit("Indiquez la base d'évaluation : EVAL_DATABASE_URL ou --database-url")
-    name = urlparse(url).path.lstrip("/")
-    if not name.endswith(("_test", "_eval")):
-        raise SystemExit(
-            f"Refus : la base « {name} » va être VIDÉE. Son nom doit finir par _test ou _eval."
-        )
-    return url
 
 
 def main() -> None:
@@ -68,18 +55,15 @@ def main() -> None:
     parser.add_argument("--note", default="", help="raison de la mise à jour de la référence")
     args = parser.parse_args()
 
-    url = safe_database_url(args.database_url)
     s = get_settings()
     start = time.perf_counter()
     embedder = FastEmbedEmbedder(s.embedding_model, cache_dir=s.embedding_cache_dir)
-    store = PgVectorStore(url, dim=embedder.dim)
-    store.conn.execute("DROP TABLE IF EXISTS chunks, notices")
-    store.init_schema()
-
-    notices = load_corpus(args.corpus)
-    n_notices, n_chunks = load_into_store(
-        notices, embedder, store, max_chars=s.chunk_size, overlap=s.chunk_overlap
-    )
+    try:
+        store, n_notices, n_chunks = prepare_store(
+            args.database_url, embedder, load_corpus(args.corpus), s.chunk_size, s.chunk_overlap
+        )
+    except ValueError as exc:  # base absente ou nom non protégé
+        raise SystemExit(str(exc)) from exc
     print(f"Corpus chargé : {n_notices} avis, {n_chunks} morceaux")
 
     questions = load_questions(args.questions)
