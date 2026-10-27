@@ -10,10 +10,13 @@ brut), plus quelques champs utiles. Deux raisons :
 - l'enregistrement brut contient les noms et coordonnées d'agents publics : notre lecteur
   les écarte, et ce fichier sera publié sur GitHub ;
 - il est environ deux fois plus petit (les données eForms brutes sont verbeuses).
-Masquage : les avis contiennent parfois des courriels et des téléphones dans leur texte
-libre (constaté le 24/10 : 24 avis sur 240). Ils sont remplacés par [courriel] et
-[téléphone] avant l'écriture du fichier. Effet négligeable sur la recherche : personne ne
-cherche un marché par l'adresse électronique de l'acheteur.
+Masquage : contrairement à ce qu'on croyait, le texte contient des données personnelles
+(constaté le 24/10 en auditant le fichier : 96 avis sur 240 avec téléphone ou courriel,
+102 lignes « nomContact » avec parfois le nom d'un agent). Lignes de contact supprimées,
+noms après une civilité, courriels et téléphones remplacés par [personne], [courriel],
+[téléphone] avant l'écriture du fichier. Personne ne cherche un marché
+par le téléphone de l'acheteur, mais le texte change, donc les vecteurs aussi : c'est une
+des raisons pour lesquelles le score du corpus diffère un peu de celui de la base locale.
 Conséquence à connaître : une modification du lecteur d'avis (ingestion/) n'est pas
 mesurée par cette évaluation. Il faudra alors régénérer le corpus.
 
@@ -40,8 +43,28 @@ EMAIL = re.compile(r"[\w.%+-]+@[\w-]+(?:\.[\w-]+)+")
 PHONE = re.compile(r"(?<!\d)(?:\+33\s?|0)[1-9](?:[\s.-]?\d{2}){4}(?!\d)")
 
 
+# Lignes « clé : valeur » de contact recopiées par le lecteur d'avis (format BOAMP non
+# eForms) : « nomContact : Pamela L... », « telContact : ... ». Supprimées en entier : un nom
+# ne se reconnaît pas de façon fiable, mais la ligne qui le contient, si.
+CONTACT_LINE = re.compile(r"^[ \t]*(?:[a-z]+Contact|Contact)[ \t]*:.*(?:\n|$)", re.MULTILINE)
+# Noms précédés d'une civilité dans le texte libre : « Mme TANQUEREL », « M. Jean Dupont ».
+# Les grades et titres jouent le même rôle (cas réel : « auprès du Commandant F... »).
+NAME = r"[A-ZÀ-Ý][\w'-]*(?:[ \t]+[A-ZÀ-Ý][\w'-]*){0,2}"
+CIVILITY = re.compile(
+    r"\b(?:M\.|Mmes?\.?|Mlle\.?|Monsieur|Madame|Docteur|Dr\.?|Ma[iî]tre"
+    r"|Commandant|Capitaine|Lieutenant|Colonel|Adjudant|G[ée]n[ée]ral)[ \t]+" + NAME
+)
+# « Contact : » au milieu d'une phrase, suivi d'un nom (cas réel : « Contact : Cécile G... »).
+INLINE_CONTACT = re.compile(r"\b(Contact[ \t]*:[ \t]*)" + NAME)
+
+
 def redact(text: str) -> str:
-    """Masque courriels et numéros de téléphone (données personnelles possibles)."""
+    """Retire les données personnelles : lignes de contact, noms après une civilité,
+    courriels et numéros de téléphone. La règle « minimisation » du RGPD : ne publier
+    que ce dont l'évaluation a besoin."""
+    text = CONTACT_LINE.sub("", text)
+    text = INLINE_CONTACT.sub(r"\1[personne]", text)
+    text = CIVILITY.sub("[personne]", text)
     return PHONE.sub("[téléphone]", EMAIL.sub("[courriel]", text))
 
 
