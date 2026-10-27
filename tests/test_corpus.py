@@ -67,3 +67,15 @@ def test_lignes_de_contact_et_noms_supprimes():
     assert "nomOfficiel : Mairie de Raismes\ncapaciteExercice" in out  # le reste est gardé
     assert "[personne]" in out and "[téléphone]" in out
     assert "Monsieur le Maire" in out  # une fonction n'est pas un nom de personne
+
+
+def test_contact_en_milieu_de_phrase_et_grades():
+    text = (
+        "Visite obligatoire. Contact : Cécile GONCALVES - cecile.g@ville.fr. "
+        "S'inscrire auprès du Commandant Faure : Contact : visite@sdis.fr. "
+        "Le maître d'ouvrage est la commune."
+    )
+    out = redact(text)
+    assert "GONCALVES" not in out and "Cécile" not in out and "Faure" not in out
+    assert "Contact : [personne]" in out and "Contact : [courriel]" in out
+    assert "maître d'ouvrage" in out  # « maître » suivi d'un nom commun : gardé

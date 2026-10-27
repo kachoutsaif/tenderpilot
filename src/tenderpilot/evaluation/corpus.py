@@ -48,10 +48,14 @@ PHONE = re.compile(r"(?<!\d)(?:\+33\s?|0)[1-9](?:[\s.-]?\d{2}){4}(?!\d)")
 # ne se reconnaît pas de façon fiable, mais la ligne qui le contient, si.
 CONTACT_LINE = re.compile(r"^[ \t]*(?:[a-z]+Contact|Contact)[ \t]*:.*(?:\n|$)", re.MULTILINE)
 # Noms précédés d'une civilité dans le texte libre : « Mme TANQUEREL », « M. Jean Dupont ».
+# Les grades et titres jouent le même rôle (cas réel : « auprès du Commandant F... »).
+NAME = r"[A-ZÀ-Ý][\w'-]*(?:[ \t]+[A-ZÀ-Ý][\w'-]*){0,2}"
 CIVILITY = re.compile(
-    r"\b(?:M\.|Mmes?\.?|Mlle\.?|Monsieur|Madame)[ \t]+"
-    r"[A-ZÀ-Ý][\w'-]*(?:[ \t]+[A-ZÀ-Ý][\w'-]*){0,2}"
+    r"\b(?:M\.|Mmes?\.?|Mlle\.?|Monsieur|Madame|Docteur|Dr\.?|Ma[iî]tre"
+    r"|Commandant|Capitaine|Lieutenant|Colonel|Adjudant|G[ée]n[ée]ral)[ \t]+" + NAME
 )
+# « Contact : » au milieu d'une phrase, suivi d'un nom (cas réel : « Contact : Cécile G... »).
+INLINE_CONTACT = re.compile(r"\b(Contact[ \t]*:[ \t]*)" + NAME)
 
 
 def redact(text: str) -> str:
@@ -59,6 +63,7 @@ def redact(text: str) -> str:
     courriels et numéros de téléphone. La règle « minimisation » du RGPD : ne publier
     que ce dont l'évaluation a besoin."""
     text = CONTACT_LINE.sub("", text)
+    text = INLINE_CONTACT.sub(r"\1[personne]", text)
     text = CIVILITY.sub("[personne]", text)
     return PHONE.sub("[téléphone]", EMAIL.sub("[courriel]", text))
 
