@@ -75,4 +75,4 @@ def retrieve(
     if mode == "vector":
         return vector_hits
     text_hits = store.search_fulltext(question, k=candidates, departements=departements)
-    return rrf_fuse([vector_hits, text_hits])[:k]
+    return rrf_fuse([vector_hits])[:k]  # RÉGRESSION VOLONTAIRE
