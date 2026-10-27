@@ -7,9 +7,9 @@ est bloquée avant d'arriver sur `main`.
 |---|---|---|
 | 1 | Traçage des appels d'outils MCP | fait |
 | 2 | Évaluation de la recherche dans la CI, sans LLM (hit@k, MRR) | fait |
-| 3 | Porte qualité : la CI échoue si le score passe sous un seuil | à faire |
+| 3 | Porte qualité : la CI échoue si le score passe sous un seuil | fait |
 | 4 | Évaluation complète avec LLM, à la main ou une fois par semaine | à faire |
-| 5 | Branches et pull requests, porte qualité obligatoire | à faire |
+| 5 | Branches et pull requests, porte qualité obligatoire | en cours |
 
 ## Étape 1 : traçage des appels d'outils
 
@@ -95,7 +95,15 @@ EVAL_DATABASE_URL=postgresql://tender:tender@localhost:5432/tenderpilot_eval \
 | | Avis | hit@5 | recall@5 | MRR |
 |---|---|---|---|---|
 | base locale | 300 | 0,962 | 0,866 | 0,779 |
-| corpus figé | 240 | 0,923 | 0,846 | 0,788 |
+| corpus figé (téléphones masqués) | 240 | 0,923 | 0,846 | 0,788 |
+| corpus figé (contacts retirés, 27/10) | 240 | **0,962** | **0,871** | **0,821** |
+
+Retirer les lignes de contact a **amélioré** la recherche (q15 retrouvée) : elles n'avaient
+rien à voir avec le sujet du marché mais entraient dans les vecteurs. Protéger les données
+et réduire le bruit vont ici dans le même sens.
+
+**Reproductibilité vérifiée (27/10)** : la CI (serveur GitHub) obtient exactement le même
+score que le PC : 0,962 / 0,871 / 0,821. Condition remplie pour une porte qualité.
 
 Enquête : 24 questions sur 30 ont des résultats différents, mais une seule change de verdict
 (q15). Comparaison avis par avis (nombre de morceaux et de caractères) : 96 avis diffèrent,
@@ -116,3 +124,30 @@ supprimées en entier, les noms après une civilité (M., Mme, Monsieur, Madame)
 Leçon : auditer ce qu'on publie, et ne pas croire une documentation sans la vérifier (la
 nôtre affirmait que le lecteur écartait les contacts). À faire en semaine 5 : appliquer le
 même nettoyage dès l'ingestion, pour que la base elle-même ne stocke pas ces données.
+
+## Étape 3 : la porte qualité
+
+`eval/reference.json` contient le score de référence ; `evaluation/gate.py` compare :
+
+    seuil = référence - tolérance (0,02)      -> sous le seuil : la CI échoue (code 1)
+
+| Mesure | Référence | Seuil |
+|---|---|---|
+| hit@5 | 0,962 | 0,942 |
+| recall@5 | 0,871 | 0,851 |
+| MRR | 0,821 | 0,801 |
+
+**Pourquoi 0,02 ?** 26 questions notées. Perdre une question entière coûte 1/26 ≈ 0,038 sur
+hit@5 et recall@5 : refusé. Un bon avis qui passe du rang 1 au rang 2 coûte 0,019 de MRR :
+toléré (un léger changement d'ordre n'est pas une régression).
+
+**Le cliquet** : quand une modification améliore la recherche, on lance
+`python scripts/evaluate_ci.py --update-reference --note "pourquoi"` et on publie le nouveau
+`eval/reference.json` dans la même pull request. Le plancher monte ; il ne redescend que par
+une décision visible dans le diff, expliquée dans la pull request.
+
+**Limites, à dire en entretien :**
+- 26 questions, c'est peu : la porte détecte une question perdue, pas une baisse diffuse.
+- Elle mesure la recherche, pas la réponse du LLM (étape 4) ni le lecteur d'avis (le corpus
+  est déjà lu ; une modification de `ingestion/` demande de régénérer le corpus).
+- Questions écrites en regardant les avis : biais de sélection (voir semaine 2).
