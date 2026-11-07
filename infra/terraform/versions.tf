@@ -11,6 +11,11 @@ terraform {
       source  = "hashicorp/aws"
       version = ">= 5.0, < 7.0"
     }
+    # Génère le mot de passe de PostgreSQL : personne ne le choisit, personne ne le tape.
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.5, < 4.0"
+    }
   }
 }
 

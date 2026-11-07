@@ -1,4 +1,11 @@
-# Copiez ce fichier en terraform.tfvars (ignoré par git) et mettez VOTRE adresse IP.
-# Pour la connaître :  curl -s https://checkip.amazonaws.com
+# Copiez ce fichier en terraform.tfvars (ignoré par git) et mettez VOS valeurs.
+
+# Votre adresse IP publique, suivie de /32. Pour la connaître :
+#   curl -s https://checkip.amazonaws.com
 allowed_cidr = "203.0.113.10/32"
-# region     = "eu-west-3"
+
+# Adresse qui reçoit les alertes de budget.
+alert_email = "vous@exemple.fr"
+
+# region           = "eu-west-3"
+# budget_limit_usd = 10

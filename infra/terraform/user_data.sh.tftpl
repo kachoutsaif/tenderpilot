@@ -1,0 +1,54 @@
+#!/bin/bash
+# Exécuté UNE fois, au premier démarrage du serveur (user data EC2).
+# Il installe Docker, puis écrit et lance /opt/tenderpilot/start.sh.
+# start.sh peut être relancé à la main (Session Manager), par exemple après avoir mis la
+# vraie clé Groq dans Parameter Store.
+#
+# Syntaxe : ce fichier est un MODÈLE Terraform. Les variables Terraform s'écrivent avec
+# un dollar suivi d'accolades ; les variables bash, avec un dollar seul ($VAR).
+set -euo pipefail
+exec > >(tee -a /var/log/tenderpilot-boot.log) 2>&1
+
+dnf install -y docker
+systemctl enable --now docker
+
+mkdir -p /opt/tenderpilot /srv/tenderpilot/pgdata
+cat > /opt/tenderpilot/start.sh <<'SCRIPT'
+#!/bin/bash
+set -euo pipefail
+
+# Les secrets sont lus au lancement, depuis Parameter Store, grâce au rôle du serveur.
+# Ils ne sont écrits dans aucun fichier.
+secret() {
+  aws ssm get-parameter --region ${region} --name "$1" --with-decryption \
+    --query Parameter.Value --output text
+}
+DB_PASSWORD=$(secret ${db_password_param})
+LLM_API_KEY=$(secret ${llm_key_param})
+
+docker network create tenderpilot 2>/dev/null || true
+docker rm -f api db 2>/dev/null || true
+
+# Chaque conteneur envoie ses journaux dans CloudWatch (un flux par conteneur).
+LOGS="--log-driver awslogs --log-opt awslogs-region=${region} --log-opt awslogs-group=${log_group}"
+
+# PostgreSQL + pgvector : AUCUN port publié, joignable seulement par l'API (réseau Docker).
+docker run -d --name db --restart unless-stopped --network tenderpilot \
+  -e POSTGRES_USER=tender -e POSTGRES_PASSWORD="$DB_PASSWORD" -e POSTGRES_DB=tenderpilot \
+  -v /srv/tenderpilot/pgdata:/var/lib/postgresql/data \
+  $LOGS --log-opt awslogs-stream=db \
+  pgvector/pgvector:pg16
+
+docker pull ${app_image}
+docker run -d --name api --restart unless-stopped --network tenderpilot \
+  -p ${api_port}:8000 \
+  -e DATABASE_URL="postgresql://tender:$DB_PASSWORD@db:5432/tenderpilot" \
+  -e LLM_API_KEY="$LLM_API_KEY" \
+  -e RETRIEVAL_MODE=hybrid \
+  $LOGS --log-opt awslogs-stream=api \
+  ${app_image}
+
+echo "TenderPilot lancé : port ${api_port}"
+SCRIPT
+chmod 700 /opt/tenderpilot/start.sh
+/opt/tenderpilot/start.sh
