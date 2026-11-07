@@ -1,0 +1,16 @@
+# Terraform : ces fichiers ne vont JAMAIS dans git.
+# (Un commentaire doit être sur sa propre ligne : git ne comprend pas « motif # commentaire ».)
+
+# fournisseurs téléchargés par « terraform init » (plusieurs centaines de Mo)
+.terraform/
+
+# l'ÉTAT : la liste des ressources créées ; il peut contenir des secrets
+*.tfstate
+*.tfstate.*
+
+# vos valeurs (votre adresse IP...) ; seul l'exemple est publié
+*.tfvars
+!*.tfvars.example
+
+crash.log
+*.tfplan
