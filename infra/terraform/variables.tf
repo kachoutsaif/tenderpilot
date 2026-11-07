@@ -29,3 +29,26 @@ variable "api_port" {
   type        = number
   default     = 8000
 }
+
+variable "instance_type" {
+  description = "Taille du serveur. t3.small = 2 Go de mémoire (modèle d'embedding + PostgreSQL + API)."
+  type        = string
+  default     = "t3.small"
+}
+
+variable "app_image" {
+  description = "Image Docker de l'application, construite par GitHub Actions."
+  type        = string
+  default     = "ghcr.io/kachoutsaif/tenderpilot:latest"
+}
+
+variable "alert_email" {
+  description = "Adresse qui reçoit les alertes de budget."
+  type        = string
+}
+
+variable "budget_limit_usd" {
+  description = "Budget mensuel en dollars. Alerte à 50 % dépensés et à 100 % prévus."
+  type        = number
+  default     = 10
+}
