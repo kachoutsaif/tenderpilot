@@ -9,16 +9,23 @@ data "aws_ssm_parameter" "al2023" {
 # Journaux : nos lignes JSON « appel_outil » de la semaine 4 arriveront ici.
 # Conservation 7 jours : assez pour une démo, et le stockage reste quasi gratuit.
 resource "aws_cloudwatch_log_group" "app" {
+  #checkov:skip=CKV_AWS_338:7 jours suffisent pour une demo ; garder moins, c'est aussi minimiser les donnees (RGPD).
+  #checkov:skip=CKV_AWS_158:Journaux deja chiffres au repos par CloudWatch ; une cle KMS dediee coute environ 1 dollar par mois.
   name              = "/tenderpilot/app"
   retention_in_days = 7
 }
 
 resource "aws_instance" "server" {
+  #checkov:skip=CKV_AWS_126:Surveillance detaillee (metriques a la minute) payante ; les metriques a 5 minutes suffisent.
+  #checkov:skip=CKV_AWS_88:IP publique necessaire pour SORTIR (Groq, images, AWS) sans NAT Gateway (plus de 30 dollars par mois) ; entree limitee au port API depuis une seule IP.
   ami                    = data.aws_ssm_parameter.al2023.value
   instance_type          = var.instance_type
   subnet_id              = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.app.id]
   iam_instance_profile   = aws_iam_instance_profile.server.name
+
+  associate_public_ip_address = true # le seul élément du sous-réseau avec une IP publique
+  ebs_optimized               = true # gratuit sur les t3, débit disque garanti (CKV_AWS_135)
 
   root_block_device {
     volume_type = "gp3"

@@ -15,6 +15,7 @@ resource "random_password" "db" {
 }
 
 resource "aws_ssm_parameter" "db_password" {
+  #checkov:skip=CKV_AWS_337:Chiffre par la cle AWS geree (aws/ssm) ; une cle KMS dediee coute environ 1 dollar par mois.
   name        = "/tenderpilot/db_password"
   description = "Mot de passe PostgreSQL de TenderPilot"
   type        = "SecureString"
@@ -22,6 +23,7 @@ resource "aws_ssm_parameter" "db_password" {
 }
 
 resource "aws_ssm_parameter" "llm_api_key" {
+  #checkov:skip=CKV_AWS_337:Chiffre par la cle AWS geree (aws/ssm) ; une cle KMS dediee coute environ 1 dollar par mois.
   name        = "/tenderpilot/llm_api_key"
   description = "Cle API Groq (a definir avec aws ssm put-parameter --overwrite)"
   type        = "SecureString"

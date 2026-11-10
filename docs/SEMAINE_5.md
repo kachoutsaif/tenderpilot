@@ -6,8 +6,8 @@ puis la détruire en une commande. Sous contrainte de budget.
 | Étape | Contenu | Compte AWS ? | État |
 |---|---|---|---|
 | 1 | Installer Terraform, choisir l'architecture | non | fait |
-| 2 | Code Terraform : réseau, pare-feu, serveur, rôle, secrets, budget | non | en cours |
-| 3 | Vérifier le code Terraform dans la CI | non | à faire |
+| 2 | Code Terraform : réseau, pare-feu, serveur, rôle, secrets, budget | non | fait |
+| 3 | Vérifier le code Terraform dans la CI (fmt, validate, Checkov) | non | fait |
 | 4 | Construire l'image Docker dans GitHub Actions (ghcr.io) | non | à faire |
 | 5 | Déployer, démontrer, mesurer, `terraform destroy` | oui | à faire |
 
@@ -61,3 +61,30 @@ Internet (votre IP seulement) ──► port 8000
 EC2 t3.small quelques centimes de l'heure, adresse IPv4 publique ~0,005 $/h, disque 20 Go
 facturé au prorata ; VPC, security group, Parameter Store standard, budget : gratuits.
 Total : de l'ordre de 0,10 $. À vérifier après la démo dans Billing → Cost Explorer.
+
+## Étape 3 : analyse de sécurité de l'infrastructure (Checkov)
+
+Checkov compare les fichiers `.tf` à plusieurs centaines de règles de bonnes pratiques AWS,
+sans compte AWS. Premier passage (7/11) : **56 règles respectées, 10 non respectées**.
+Méthode : mesurer, comprendre chaque alerte, puis corriger si c'est gratuit et utile, ou
+ignorer avec une justification écrite **dans la ressource** (`#checkov:skip=...`).
+
+| Règle | Ce qu'elle demande | Décision |
+|---|---|---|
+| CKV_AWS_394 | zone de disponibilité fixe | **corrigé** : zone `<région>a`, plus de source « première zone disponible » |
+| CKV_AWS_130 | pas d'IP publique automatique dans le sous-réseau | **corrigé** : seul le serveur demande une IP, explicitement |
+| CKV_AWS_135 | disque EBS optimisé | **corrigé** : gratuit sur les t3 |
+| CKV2_AWS_12 | security group par défaut fermé | **corrigé** : repris en main sans aucune règle |
+| CKV_AWS_337 (×2) | clé KMS dédiée pour Parameter Store | ignoré : déjà chiffré par la clé gérée AWS ; clé dédiée ≈ 1 $/mois |
+| CKV_AWS_158 | clé KMS dédiée pour les journaux | ignoré : déjà chiffrés au repos ; même coût |
+| CKV_AWS_338 | journaux conservés 1 an | ignoré : 7 jours pour une démo, et garder moins = minimiser les données |
+| CKV_AWS_126 | surveillance détaillée (1 minute) | ignoré : payante ; 5 minutes suffisent |
+| CKV2_AWS_11 | journaux de flux réseau (flow logs) | ignoré : payants ; à activer en production |
+
+Bilan : **4 corrections gratuites, 6 exceptions justifiées** (toutes par le coût, pour une
+démo). Ce qui compte n'est pas « zéro alerte » mais une décision écrite pour chacune.
+
+La CI (`.github/workflows/infra.yml`) lance à chaque pull request `terraform fmt -check`,
+`terraform validate` et Checkov, avec des versions fixées (Terraform 1.17.1, Checkov 3.4.3) :
+une nouvelle règle Checkov ne doit pas faire échouer la CI sans que le code ait changé.
+Une nouvelle alerte sur une PR signale donc une régression de sécurité de l'infrastructure.

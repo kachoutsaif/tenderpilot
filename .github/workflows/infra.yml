@@ -1,0 +1,44 @@
+name: Infrastructure
+
+# Vérifie le code Terraform à chaque pull request : mise en forme, cohérence, sécurité.
+# Aucun compte AWS n'est utilisé : rien n'est créé, rien n'est facturé.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra/terraform
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.17.1" # la même version que sur le PC
+
+      - name: Mise en forme (terraform fmt)
+        run: terraform fmt -check -recursive
+
+      - name: Cohérence (terraform validate)
+        # -backend=false : télécharge les fournisseurs (versions du fichier de verrouillage)
+        # sans chercher d'état ni d'identifiants AWS.
+        run: |
+          terraform init -backend=false -input=false
+          terraform validate
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Sécurité (Checkov)
+        # Version fixée : une nouvelle version de Checkov ajoute des règles, et la CI
+        # pourrait échouer sans que le code ait changé (même leçon que la porte qualité).
+        # Les exceptions sont justifiées dans le code, par des commentaires checkov:skip.
+        run: |
+          pip install -q checkov==3.4.3
+          checkov -d . --framework terraform --compact --quiet
