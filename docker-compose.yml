@@ -1,6 +1,6 @@
 services:
   db:
-    image: pgvector/pgvector:pg16
+    image: pgvector/pgvector:0.8.7-pg16
     environment:
       POSTGRES_USER: tender
       POSTGRES_PASSWORD: tender

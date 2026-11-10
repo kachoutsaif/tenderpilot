@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.14-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -9,7 +9,8 @@ WORKDIR /app
 # Dépendances d'abord : Docker garde cette couche en cache tant que pyproject.toml ne change pas
 COPY pyproject.toml README.md ./
 COPY src ./src
-RUN pip install .
+COPY requirements-lock.txt ./
+RUN pip install --no-cache-dir -r requirements-lock.txt && pip install --no-cache-dir --no-deps .
 
 COPY scripts ./scripts
 COPY tests/fixtures ./tests/fixtures

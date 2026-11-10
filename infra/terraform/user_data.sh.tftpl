@@ -37,7 +37,7 @@ docker run -d --name db --restart unless-stopped --network tenderpilot \
   -e POSTGRES_USER=tender -e POSTGRES_PASSWORD="$DB_PASSWORD" -e POSTGRES_DB=tenderpilot \
   -v /srv/tenderpilot/pgdata:/var/lib/postgresql/data \
   $LOGS --log-opt awslogs-stream=db \
-  pgvector/pgvector:pg16
+  pgvector/pgvector:0.8.7-pg16
 
 docker pull ${app_image}
 docker run -d --name api --restart unless-stopped --network tenderpilot \
