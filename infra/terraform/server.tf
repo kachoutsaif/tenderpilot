@@ -17,6 +17,7 @@ resource "aws_cloudwatch_log_group" "app" {
 
 resource "aws_instance" "server" {
   #checkov:skip=CKV_AWS_126:Surveillance detaillee (metriques a la minute) payante ; les metriques a 5 minutes suffisent.
+  #checkov:skip=CKV_AWS_88:IP publique necessaire pour SORTIR (Groq, images, AWS) sans NAT Gateway (plus de 30 dollars par mois) ; entree limitee au port API depuis une seule IP.
   ami                    = data.aws_ssm_parameter.al2023.value
   instance_type          = var.instance_type
   subnet_id              = aws_subnet.public.id
