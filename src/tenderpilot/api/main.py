@@ -9,8 +9,10 @@ from __future__ import annotations
 from functools import lru_cache
 
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
+from tenderpilot.api.ui import UI_HTML
 from tenderpilot.config import get_settings
 from tenderpilot.rag.pipeline import answer_question
 
@@ -46,7 +48,16 @@ def get_llm():
     from tenderpilot.rag.llm import OpenAICompatibleLLM
 
     s = get_settings()
-    return OpenAICompatibleLLM(api_key=s.llm_api_key, base_url=s.llm_base_url, model=s.llm_model)
+    # gpt-oss « réfléchit » avant d'écrire, et cette réflexion compte dans max_tokens :
+    # sans réglage, les réponses longues (un tableau de 5 avis) étaient coupées net.
+    options = {"reasoning_effort": "low"} if "gpt-oss" in s.llm_model else {}
+    return OpenAICompatibleLLM(
+        api_key=s.llm_api_key,
+        base_url=s.llm_base_url,
+        model=s.llm_model,
+        max_tokens=4000,
+        **options,
+    )
 
 
 # --- Schémas d'entrée / sortie ---
@@ -103,3 +114,9 @@ def ask(
         citations=[CitationOut(**c.__dict__) for c in result.citations],
         invalid_citations=result.invalid_citations,
     )
+
+
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+def interface() -> str:
+    """Interface web de démonstration."""
+    return UI_HTML
