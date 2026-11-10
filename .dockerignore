@@ -7,3 +7,15 @@ __pycache__
 .ruff_cache
 data
 docs
+# --- ajoutés en semaine 5 ---
+# Terraform : ~600 Mo de fournisseurs, et l'état contient le mot de passe PostgreSQL
+infra
+*.tfstate
+*.tfstate.*
+*.tfvars
+# sorties locales
+out
+eval/results
+.github
+.env.*
+!.env.example
