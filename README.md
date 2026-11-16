@@ -115,7 +115,8 @@ python scripts/init_db.py
 python scripts/ingest_boamp.py --days 14 --limit 200   # avis réels du BOAMP
 python scripts/ask.py "Quels marchés concernent la maintenance informatique ?"
 python scripts/qualify.py 26-98519                     # agent : qualification + brouillon
-uvicorn tenderpilot.api.main:app                       # API : http://localhost:8000/docs
+uvicorn tenderpilot.api.main:app                       # interface : http://localhost:8000
+                                                       # API documentée : http://localhost:8000/docs
 ```
 
 Ou avec l'image publiée : `docker pull ghcr.io/kachoutsaif/tenderpilot:latest`.
@@ -128,6 +129,9 @@ Serveur MCP pour Claude Desktop : [docs/SEMAINE_3_MCP.md](docs/SEMAINE_3_MCP.md)
   peut passer).
 - Le texte écrit par un hôte MCP autour de nos outils échappe à nos garde-fous.
 - La recherche renvoie toujours k résultats, même non pertinents (pas de seuil absolu).
+- Le LLM ne connaît pas la date du jour : « quels marchés sont ouverts ? » repose sur son
+  interprétation des dates citées. Correction prévue : filtrer en SQL sur la date limite,
+  comme pour les départements (ce qui peut être une règle ne doit pas être confié au LLM).
 
 ## Documentation, semaine par semaine
 
