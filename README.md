@@ -13,6 +13,17 @@ décide s'il faut répondre (GO / À ÉTUDIER / NO-GO) et rédige un brouillon d
 
 ---
 
+## Aperçu
+
+| | |
+|---|---|
+| ![Interface web](docs/images/1-interface.png) | ![Qualification NO-GO dans Claude Desktop](docs/images/2-qualification-no-go.png) |
+| **Interface web** : question en langage naturel, réponse avec sources citées et cliquables. | **Claude Desktop, via MCP** : la date limite est dépassée, les règles proposent NO-GO, de façon déterministe, et laissent la décision à l'utilisateur. |
+| ![Brouillon pour le lot 1](docs/images/3-brouillon-lot1.png) | ![Porte qualité en échec](docs/images/4-porte-qualite-echec.png) |
+| **L'utilisateur passe outre et valide en GO** : brouillon du lot 1 uniquement, relu automatiquement (fidélité 1,0), `[À COMPLÉTER]` là où seule l'entreprise peut répondre. | **Régression volontaire bloquée par la CI** : sans le plein texte, hit@5 tombe de 0,962 à 0,692, sous le seuil de 0,942. |
+| ![Contrôles au vert](docs/images/5-checks-verts.png) | ![Rôle IAM Terraform](docs/images/6-terraform-iam.png) |
+| **Quand la qualité est là** : tests, évaluation, image Docker et Terraform + Checkov passent ; les contrôles obligatoires autorisent la fusion. | **Infrastructure en Terraform** : rôle IAM au moindre privilège, sans clé d'accès sur le serveur. |
+
 ## Ce qu'il fait, sur un cas réel
 
 Question posée dans **Claude Desktop**, qui utilise TenderPilot comme serveur MCP :
@@ -22,9 +33,11 @@ Question posée dans **Claude Desktop**, qui utilise TenderPilot comme serveur M
 1. `rechercher_avis(departements=["59"])` : recherche hybride filtrée en SQL ;
 2. `lire_avis("26-98519")` : Ville de Maubeuge, nettoyage des locaux, **2 lots**, **avis rectifié**
    (date limite reportée au 09/11/2026), critères technique 11 pts / prix 8 pts / environnement 1 pt ;
-3. qualification par **règles** : GO (secteur, zone, délai OK ; chiffre d'affaires et
-   certifications « à vérifier » dans le dossier de consultation) ;
-4. **l'utilisateur valide** ; alors seulement, rédaction d'un brouillon vérifié par un juge
+3. qualification par **règles** : secteur et zone OK, chiffre d'affaires et certifications
+   « à vérifier » dans le dossier de consultation, **délai dépassé → NO-GO proposé**. Les règles
+   connaissent la date du jour ; un LLM seul, non ;
+4. **l'utilisateur garde le dernier mot** : il passe outre (pour préparer le renouvellement du
+   marché) et demande le lot 1. Alors seulement, rédaction d'un brouillon vérifié par un juge
    (fidélité 100 %), avec `[À COMPLÉTER]` partout où l'entreprise doit fournir l'information.
 
 Chaque appel d'outil est tracé (une ligne JSON : outil, paramètres, durée, statut).
@@ -75,10 +88,10 @@ Serveur MCP (6 outils, 1 ressource) ──► Claude Desktop, ou tout autre hôt
 | ruff + 150+ tests (dont intégration pgvector) | chaque PR | bloque la fusion |
 | **Porte qualité** : hit@5, recall@5, MRR sur corpus figé, seuil = référence − 0,02 | chaque PR | **bloque la fusion** si la recherche régresse |
 | Terraform : fmt, validate, **Checkov** (sécurité) | chaque PR | bloque la fusion |
-| Image Docker construite (et publiée sur ghcr.io depuis `main`) | chaque PR | bloque la fusion |
+| Image Docker construite (et publiée sur ghcr.io depuis `main`) | chaque PR | informe |
 | Évaluation des réponses avec LLM (fidélité, hors sujet) | à la main et chaque lundi | informe (non déterministe) |
 
-`main` est protégée : pull request obligatoire, tous les contrôles requis.
+`main` est protégée : pull request obligatoire ; les tests (avec la porte qualité) et Terraform sont des contrôles requis.
 
 **Deux incidents qui ont rendu le système plus solide :**
 1. *La porte bloque une vraie régression.* Retirer le plein texte fait passer hit@5 de 0,962 à
@@ -115,7 +128,8 @@ python scripts/init_db.py
 python scripts/ingest_boamp.py --days 14 --limit 200   # avis réels du BOAMP
 python scripts/ask.py "Quels marchés concernent la maintenance informatique ?"
 python scripts/qualify.py 26-98519                     # agent : qualification + brouillon
-uvicorn tenderpilot.api.main:app                       # API : http://localhost:8000/docs
+uvicorn tenderpilot.api.main:app                       # interface : http://localhost:8000
+                                                       # API : http://localhost:8000/docs
 ```
 
 Ou avec l'image publiée : `docker pull ghcr.io/kachoutsaif/tenderpilot:latest`.
@@ -128,6 +142,11 @@ Serveur MCP pour Claude Desktop : [docs/SEMAINE_3_MCP.md](docs/SEMAINE_3_MCP.md)
   peut passer).
 - Le texte écrit par un hôte MCP autour de nos outils échappe à nos garde-fous.
 - La recherche renvoie toujours k résultats, même non pertinents (pas de seuil absolu).
+- Dans l'interface web, le LLM ne connaît pas la date du jour : il peut présenter comme
+  « ouvert » un marché dont la date limite est passée (seules les règles de l'agent la
+  vérifient). Correctif prévu : filtrer les avis expirés en SQL.
+- Le rédacteur recopie parfois une consigne de son prompt dans le brouillon. Correctif prévu :
+  reformuler la consigne et nettoyer la sortie.
 
 ## Documentation, semaine par semaine
 
